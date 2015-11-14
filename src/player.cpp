@@ -1,6 +1,8 @@
 #include "player.h"
 #include <QDebug>
 
+#include <QTimer>
+
 namespace game{
 
 Player::Player(char mark)
@@ -21,7 +23,8 @@ void Player::makeMove(char mark, const char* state)
 
     if(mark == selfMark_){
         int pos = move(state);
-        emit sendMove(pos);
+        //emit sendMove(pos);
+        QTimer::singleShot(600, [this, pos](){emit sendMove(pos);} );
     }
 }
 
