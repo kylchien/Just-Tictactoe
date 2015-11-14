@@ -1,6 +1,4 @@
 #include "player.h"
-#include <QDebug>
-
 #include <QTimer>
 
 namespace game{
@@ -19,11 +17,9 @@ int Player::move(const char* state)
 
 void Player::makeMove(char mark, const char* state)
 {
-    //qDebug() << "receive mark:" << mark << ", state:" << state;
-
     if(mark == selfMark_){
         int pos = move(state);
-        //emit sendMove(pos);
+        //delay AI's reponse (600ms) so human can percept its moves
         QTimer::singleShot(600, [this, pos](){emit sendMove(pos);} );
     }
 }
