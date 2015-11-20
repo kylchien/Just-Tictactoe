@@ -5,7 +5,6 @@
 
 namespace game{
 
-class TicTacToe;
 
 class Player : public QObject
 {

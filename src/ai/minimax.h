@@ -11,7 +11,7 @@ class Minimax :public game::Player
 {
 public:
     explicit Minimax(char mark, bool randomForTie = true);
-    ~Minimax();
+    virtual ~Minimax();
 
     int move(const char* state);
 
@@ -23,6 +23,8 @@ protected:
     static constexpr int MAX_DEPTH = 9;
     static constexpr float EPSILON = 0.001;
     static constexpr float DEPTH_ADJ = 0.01;
+
+    static constexpr float CENTER_ADJ = 0.05;
 
     bool random_;
     std::vector<int> tieBreaker_;

@@ -10,7 +10,7 @@ using std::vector;
 using std::max;
 using std::min;
 
-static bool DEBUG = false;
+static bool DEBUG = true;
 
 bool approxEqual(float f1, float f2, float epsilon)
 {
@@ -41,7 +41,7 @@ int Minimax::move(const char* state)
 {
 
     vector<char*> futStates;
-    game::genFutureStates(selfMark_, state, futStates);
+    game::allocNextStates(selfMark_, state, futStates);
 
     float best = -INFI;
     int bestPos = -1;
@@ -85,29 +85,37 @@ int Minimax::move(const char* state)
     if(DEBUG)
         qDebug() << "best pos:" << bestPos << "\n";
 
+    game::deallocNextStates(futStates);
     return bestPos;
 }
 
 
 float Minimax::minimax(const char* state, int depth, bool isMax)
 {
+    float centerAdj = 0;
+    if(state[4]== selfMark_)
+        centerAdj = CENTER_ADJ;
+    else if(state[4] == opponentMark_)
+        centerAdj = -CENTER_ADJ;
+
     if(game::isWon(state,selfMark_)){
-        return WIN + depth*DEPTH_ADJ;
+        return WIN + depth*DEPTH_ADJ + centerAdj;
     }
     if(game::isWon(state,opponentMark_)){
-        return LOSE - depth*DEPTH_ADJ;
+        return LOSE - depth*DEPTH_ADJ + centerAdj;
     }
     if(game::isFull(state) || depth == 0){
-        int sign = (isMax)?1:-1;
-        return DRAW + sign*(depth*DEPTH_ADJ);
+        //int sign = (isMax)?1:-1;
+        //return DRAW + sign*(depth*DEPTH_ADJ);
+        return DRAW + centerAdj;
     }
 
 
     vector<char*> futStates;
     if(isMax)
-        game::genFutureStates(selfMark_, state, futStates);
+        game::allocNextStates(selfMark_, state, futStates);
     else
-        game::genFutureStates(opponentMark_, state, futStates);
+        game::allocNextStates(opponentMark_, state, futStates);
 
     float best;
     if(isMax){
@@ -121,9 +129,7 @@ float Minimax::minimax(const char* state, int depth, bool isMax)
             best = min(best, minimax(futState, depth-1, true));
     }
 
-    for(auto futState : futStates)
-        free(futState);
-
+    game::deallocNextStates(futStates);
     return best;
 }
 

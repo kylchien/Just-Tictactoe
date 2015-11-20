@@ -9,7 +9,11 @@ SOURCES += \
     src/tictactoe.cpp \
     src/utility.cpp \
     src/player.cpp \
-    src/ai/minimax.cpp
+    src/ai/minimax.cpp \
+    src/gameEngine.cpp \
+    src/gameDef.cpp \
+    src/config.cpp \
+    src/ai/Newell_Simon.cpp
 
 
 RESOURCES += qml.qrc \
@@ -26,6 +30,10 @@ HEADERS += \
     src/tictactoe.h \
     src/player.h \
     src/ai/ai.h \
-    src/ai/minimax.h
+    src/ai/minimax.h \
+    src/gameEngine.h \
+    src/gameDef.h \
+    src/config.h \
+    src/ai/Newell_Simon.h
 
 

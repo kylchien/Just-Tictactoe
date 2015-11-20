@@ -3,5 +3,6 @@
         <file>asset/o.png</file>
         <file>asset/x.png</file>
         <file>asset/board.png</file>
+        <file>game.config</file>
     </qresource>
 </RCC>

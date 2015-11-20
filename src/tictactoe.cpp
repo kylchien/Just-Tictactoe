@@ -2,8 +2,6 @@
 #include "player.h"
 #include "ai/ai.h"
 #include <QtDebug>
-#include <sstream>
-
 
 
 
@@ -16,7 +14,7 @@ TicTacToe::TicTacToe()
 
 TicTacToe::~TicTacToe()
 {
-    deallocatePlayers();
+    GameEngine::deallocPlayers();
 }
 
 void TicTacToe::setGameMode(int mode)
@@ -26,77 +24,53 @@ void TicTacToe::setGameMode(int mode)
 }
 
 
-
-void TicTacToe::deallocatePlayers()
-{
-    if(playerX_ != nullptr) delete playerX_;
-    if(playerO_ != nullptr) delete playerO_;
-    playerX_= nullptr;
-    playerO_= nullptr;
-}
-
-//handle the case that user directly closes optionWindow
-//without choosing game mode
-void TicTacToe::allocateDefaultPlayers()
-{
-    deallocatePlayers();
-    playerX_ = new Player('x');
-    playerO_ = new Player('o');
-
-}
-
 void TicTacToe::restart()
 {
-    for(int i=0; i<BOARD_SIZE; ++i)
-        board_[i] = ' ';
+    for(char& c: board_)
+        c = MARK_E;
 
-    curTurn_ = 'x';
+    GameEngine::allocDefaultPlayers();
+    curTurn_ = MARK_X;
     gameMode_ = GameMode::HH;
-    allocateDefaultPlayers();
-
     list_.clear();
+}
+
+void TicTacToe::connectPlayer(Player* p)
+{
+    connect(this, &TicTacToe::notifyPlayer,
+            p, &Player::makeMove);
+    connect(p, &Player::sendMove,
+            this, &TicTacToe::updateBoard);
 }
 
 void TicTacToe::initialize()
 {
-    //handle the case that user directly closes optionWindow
-    //without choosing game mode
-    deallocatePlayers();
-
     switch(gameMode_){
     case GameMode::HH:
-        allocateDefaultPlayers();
+        GameEngine::allocDefaultPlayers();
         break;
 
     case GameMode::HM:
-        playerX_ = new Player('x');
-        playerO_ = new ai::Minimax('o');
-        connect(this,     &TicTacToe::notifyPlayer,
-                playerO_, &Player::makeMove);
-        connect(playerO_, &Player::sendMove,
-                this,     &TicTacToe::updateBoard);
+        playerX_ = new Player(MARK_X);
+        //playerO_ = new ai::Minimax(MARK_O);
+
+        playerO_ = new ai::Newell_Simon(MARK_O);
+        connectPlayer(playerO_);
         break;
 
     case GameMode::MH:
-        playerO_ = new Player('o');
-        playerX_ = new ai::Minimax('x');
-        connect(this,     &TicTacToe::notifyPlayer,
-                playerX_, &Player::makeMove);
-        connect(playerX_, &Player::sendMove,
-                this,     &TicTacToe::updateBoard);
+        playerO_ = new Player(MARK_O);
+        //playerX_ = new ai::Minimax(MARK_X);
+        playerX_ = new ai::Newell_Simon(MARK_X);
+        connectPlayer(playerX_);
         break;
 
     case GameMode::MM:
-        playerX_ = new ai::Minimax('x');
-        connect(this,     &TicTacToe::notifyPlayer,
-                playerX_, &Player::makeMove);
-        connect(playerX_, &Player::sendMove,
-                this,     &TicTacToe::updateBoard);
-        playerO_ = new ai::Minimax('o');
-        connect(this,     &TicTacToe::notifyPlayer,
-                playerO_, &Player::makeMove);
-        connect(playerO_, &Player::sendMove,
-                this,     &TicTacToe::updateBoard);
+        //playerX_ = new ai::Minimax(MARK_X);
+        playerX_ = new ai::Newell_Simon(MARK_X);
+        playerO_ = new ai::Minimax(MARK_O);
+        connectPlayer(playerX_);
+        connectPlayer(playerO_);
         break;
 
     default:
@@ -104,50 +78,35 @@ void TicTacToe::initialize()
         break;
     }
 
-    //due to board-loading feature, we cannot simply set turn here
-    //need to evaluate entire board and decide whose turn
     curTurn_ = determineTurn(board_);
     notifyPlayers();
-
 }
 
 void TicTacToe::notifyPlayers()
 {
-    if(curTurn_ == 'x')
-        emit notifyPlayer('x', board_);
+    if(curTurn_ == MARK_X)
+        emit notifyPlayer(MARK_X, board_);
     else
-        emit notifyPlayer('o', board_);
+        emit notifyPlayer(MARK_O, board_);
 }
 
 
-void TicTacToe::loadBoard(QString boardInfo)
+void TicTacToe::loadBoard(std::string boardInfo)
 {
+   for(int i=0; i<BOARD_SIZE; ++i)
+       board_[i] = boardInfo[i];
+
    list_.clear();
-   int count = 0;
-   for(int i=0; i<BOARD_SIZE; ++i){
-       char c = boardInfo.at(i).toLatin1();
-       board_[i] = c;
-       if(c == 'x')     count++;
-       else if(c =='o') count--;
-   }
-
-   if(count>0) curTurn_ = 'o';
-   else        curTurn_ = 'x';
-
-   for(int i=0; i<BOARD_SIZE; ++i){
-       list_ << QChar(board_[i]);
-   }
+   for(char c: board_)
+       list_ << QChar(c);
 
    emit boardLoaded(list_);
 }
 
 
-
-
-//void TicTacToe::updateBoard(int pos, char mark)
 void TicTacToe::updateBoard(int pos)
 {
-    if(board_[pos] == ' '){
+    if(board_[pos] == MARK_E){
         board_[pos] = curTurn_;
         emit boardChanged(pos, curTurn_);
     }
@@ -157,16 +116,16 @@ void TicTacToe::updateBoard(int pos)
 
     //check any player wins
     std::vector<int> winPos;
-    if(outcome(board_, winPos) != Outcome::NIL){
-        std::ostringstream oss;
-        oss << curTurn_ << " wins!";
-        emit gameFinished(QString(oss.str().c_str()));
+    if(isWon(board_, winPos)){
+        char buf[8] = "  wins!";
+        buf[0] = curTurn_;
+        emit gameFinished(QString(buf));
 
         //send out the indices of connected grids to GUI
         list_.clear();
         for(auto pos:winPos)
             list_ << pos;
-        emit connected(list_);
+        emit winningPositions(list_);
 
         return;
     }
@@ -178,13 +137,59 @@ void TicTacToe::updateBoard(int pos)
     }
 
     //flip turn
-    curTurn_ = (curTurn_ == 'x')?'o':'x';
+    curTurn_ = (curTurn_ == MARK_X) ? MARK_O : MARK_X;
 
     notifyPlayers();
 
 }
 
 
+bool TicTacToe::isHumanTurn() const
+{
+    switch(gameMode_){
+    case GameMode::HH:
+        return true;
+    case GameMode::HM:
+        if(curTurn_ == MARK_X)
+            return true;
+        else
+            return false;
+    case GameMode::MH:
+        if(curTurn_ == MARK_O)
+            return true;
+        else
+            return false;
+    case GameMode::MM:
+        return false;
+    }
+    return false;
+}
+
+TicTacToe& TicTacToe::rotateCW90()
+{
+    char newBoard[BOARD_SIZE];
+    game::rotateCW90(board_, newBoard);
+    copyBoard(newBoard, board_);
+    list_.clear();
+    for(char c: board_)
+        list_ << QChar(c);
+
+    emit boardLoaded(list_);
+    return *this;
+}
+
+TicTacToe& TicTacToe::mirror()
+{
+    char newBoard[BOARD_SIZE];
+    game::mirror(board_, newBoard);
+    copyBoard(newBoard, board_);
+    list_.clear();
+    for(char c: board_)
+        list_ << QChar(c);
+
+    emit boardLoaded(list_);
+    return *this;
+}
 
 
 }
