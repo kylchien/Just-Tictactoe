@@ -10,7 +10,7 @@ ApplicationWindow {
     title: qsTr("Tic-Tac-Toe")
 
     width: boardImage.width
-    height: boardImage.height//+statusBar.implicitHeight+toolBar.implicitHeight
+    height: boardImage.height     //+statusBar.implicitHeight+toolBar.implicitHeight
     minimumWidth: 420
     maximumWidth: 420
     minimumHeight: 515
@@ -19,7 +19,9 @@ ApplicationWindow {
     Image {
         id: boardImage
         source: "asset/board.png"
+        opacity: 0.5
         anchors.centerIn: parent
+
     }
 
     property var game: gameInstance
@@ -27,7 +29,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         initOptionWindow()
-        //bgm.play()
     }
 
     Column {

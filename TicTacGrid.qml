@@ -19,6 +19,16 @@ Item {
     Image {
         id: image
         anchors.centerIn: parent
+        transform: Rotation {
+            origin.x: image.width/2; origin.y: image.height/2;
+            angle: Math.floor((Math.random() * 45) + 1) * randomSign();
+        }
+
+    }
+
+    function randomSign(){
+        if(Math.random()>0.5) return 1;
+        else                  return -1;
     }
 
     MouseArea {
@@ -35,6 +45,7 @@ Item {
         NumberAnimation { from: 1; to: 0; duration: 350; easing.type: Easing.InOutQuad }
         NumberAnimation { from: 0; to: 1; duration: 350; easing.type: Easing.InOutQuad }
     }
+
 
 }
 
