@@ -27,6 +27,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         initOptionWindow()
+        //bgm.play()
     }
 
     Column {
@@ -48,6 +49,10 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    Sound{
+        id: sound
     }
 
     /*
@@ -117,6 +122,11 @@ ApplicationWindow {
         target: game
         onBoardChanged: {
             board.children[pos].state = mark;
+            if(gameInstance.getCurrentTurn() == 'x')
+                sound.tick.play();
+            else
+                sound.blop.play();
+
         }
     }
 
@@ -125,6 +135,7 @@ ApplicationWindow {
         onGameFinished: {
             messageDisplay.text = message
             messageDisplay.visible = true
+            sound.finish.play();
         }
     }
 

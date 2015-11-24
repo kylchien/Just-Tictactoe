@@ -234,6 +234,9 @@ Player* createPlayer(PlayerType type, char mark)
     case PlayerType::Minimax:
         p = new ai::Minimax(mark);
         break;
+    case PlayerType::Newell_Simon:
+        p = new ai::Newell_Simon(mark);
+        break;
     }
     return p;
 }

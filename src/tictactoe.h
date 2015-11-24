@@ -26,6 +26,7 @@ public:
     Q_INVOKABLE void setGameMode(int mode);
     Q_INVOKABLE void notifyPlayers();
     Q_INVOKABLE bool isHumanTurn() const;
+    Q_INVOKABLE QChar getCurrentTurn() const;
     void loadBoard(std::string boardInfo);
     TicTacToe& rotateCW90();
     TicTacToe& mirror();

@@ -6,8 +6,14 @@ Item {
     property alias blink: seqAnimation
 
     states: [
-        State { name: "x"; PropertyChanges { target: image; source: "asset/x.png" } },
-        State { name: "o"; PropertyChanges { target: image; source: "asset/o.png" } }
+        State {
+            name: "x";
+            PropertyChanges { target: image; source: "asset/x.png" }
+        },
+        State {
+            name: "o";
+            PropertyChanges { target: image; source: "asset/o.png" }
+        }
     ]
 
     Image {
@@ -19,6 +25,8 @@ Item {
         anchors.fill: parent
         onClicked: parent.clicked()
     }
+
+
 
     SequentialAnimation on opacity{
         id: seqAnimation

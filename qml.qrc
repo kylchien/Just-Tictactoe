@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>TicTacGrid.qml</file>
         <file>OptionWindow.qml</file>
+        <file>Sound.qml</file>
     </qresource>
 </RCC>

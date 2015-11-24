@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     QQmlContext* ctx = engine.rootContext();
     ctx->setContextProperty("gameInstance", &gameInstance);
+    engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 
     //depth testing, ai:o

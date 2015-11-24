@@ -144,6 +144,11 @@ void TicTacToe::updateBoard(int pos)
 }
 
 
+QChar TicTacToe::getCurrentTurn() const
+{
+    return QChar(curTurn_);
+}
+
 bool TicTacToe::isHumanTurn() const
 {
     switch(gameMode_){
