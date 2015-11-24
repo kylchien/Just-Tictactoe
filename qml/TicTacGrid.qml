@@ -8,11 +8,11 @@ Item {
     states: [
         State {
             name: "x";
-            PropertyChanges { target: image; source: "asset/x.png" }
+            PropertyChanges { target: image; source: "../asset/x.png" }
         },
         State {
             name: "o";
-            PropertyChanges { target: image; source: "asset/o.png" }
+            PropertyChanges { target: image; source: "../asset/o.png" }
         }
     ]
 
@@ -21,7 +21,7 @@ Item {
         anchors.centerIn: parent
         transform: Rotation {
             origin.x: image.width/2; origin.y: image.height/2;
-            angle: Math.floor((Math.random() * 45) + 1) * randomSign();
+            angle: Math.floor((Math.random() * 90) + 1) * randomSign();
         }
 
     }

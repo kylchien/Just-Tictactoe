@@ -18,7 +18,7 @@ ApplicationWindow {
 
     Image {
         id: boardImage
-        source: "asset/board.png"
+        source: "../asset/board.png"
         opacity: 0.5
         anchors.centerIn: parent
 
