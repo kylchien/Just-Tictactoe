@@ -19,15 +19,15 @@ GameEngine::~GameEngine()
 void GameEngine::allocPlayers()
 {
     deallocPlayers();
-    playerX_ = new ai::Minimax(MARK_X);
-    playerO_ = new ai::Minimax(MARK_O);
+    playerX_ = createPlayer(PlayerType::MaybePerfect, MARK_X);
+    playerO_ = createPlayer(PlayerType::Minimax, MARK_O);
 }
 
 void GameEngine::allocDefaultPlayers()
 {
     deallocPlayers();
     playerX_ = createPlayer(PlayerType::Human, MARK_X);
-    playerO_ = createPlayer(PlayerType::Human,MARK_O);
+    playerO_ = createPlayer(PlayerType::Human, MARK_O);
 }
 
 void GameEngine::deallocPlayers()
@@ -55,7 +55,7 @@ void GameEngine::updateBoard(int pos)
         return;
 
     if(isWon(board_,MARK_O) || isWon(board_,MARK_X) || isFull(board_)){
-
+        //stub
     }
 
     //flip turn

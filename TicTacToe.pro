@@ -13,7 +13,7 @@ SOURCES += \
     src/gameEngine.cpp \
     src/gameDef.cpp \
     src/config.cpp \
-    src/ai/Newell_Simon.cpp
+    src/ai/maybePerfect.cpp
 
 
 RESOURCES += qml.qrc \
@@ -34,6 +34,6 @@ HEADERS += \
     src/gameEngine.h \
     src/gameDef.h \
     src/config.h \
-    src/ai/Newell_Simon.h
+    src/ai/maybePerfect.h
 
 

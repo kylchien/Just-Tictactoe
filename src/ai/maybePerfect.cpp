@@ -1,10 +1,11 @@
-#include "Newell_Simon.h"
+#include "maybePerfect.h"
 #include "../gameDef.h"
 #include "../utility.h"
 #include <QDebug>
 
 //#define DEBUG_FLAG
 
+//debugging macro
 #ifdef DEBUG_FLAG
     #define DEBUG(msg) \
         qDebug() << msg;
@@ -15,35 +16,35 @@
 namespace ai{
 
 //initialize class static vector
-using Function = std::function<int(Newell_Simon*, const char*)>;
-std::vector<Function> Newell_Simon::ruleSet_;
+using Function = std::function<int(MaybePerfect*, const char*)>;
+std::vector<Function> MaybePerfect::ruleSet_;
 
-Newell_Simon::Newell_Simon(char mark):Player(mark)
+MaybePerfect::MaybePerfect(char mark):Player(mark)
 {
     initialize();
 }
 
-Newell_Simon::~Newell_Simon()
+MaybePerfect::~MaybePerfect()
 {}
 
 
-void Newell_Simon::initialize()
+void MaybePerfect::initialize()
 {
     ruleSet_.clear();
 
-    //rule order matter (priority from high to low)
-    ruleSet_.push_back(&Newell_Simon::doWin);
-    ruleSet_.push_back(&Newell_Simon::doBlockWin);
-    ruleSet_.push_back(&Newell_Simon::doFork);
-    ruleSet_.push_back(&Newell_Simon::doConnectTwo);
-    ruleSet_.push_back(&Newell_Simon::doBlockFork);
-    ruleSet_.push_back(&Newell_Simon::doCenter);
-    ruleSet_.push_back(&Newell_Simon::doOppositeCorner);
-    ruleSet_.push_back(&Newell_Simon::doEmptyCorner);
-    ruleSet_.push_back(&Newell_Simon::doEmptySide);
+    //rule order matters (priority from high to low)
+    ruleSet_.push_back(&MaybePerfect::doWin);
+    ruleSet_.push_back(&MaybePerfect::doBlockWin);
+    ruleSet_.push_back(&MaybePerfect::doFork);
+    ruleSet_.push_back(&MaybePerfect::doConnectTwo);
+    ruleSet_.push_back(&MaybePerfect::doBlockFork);
+    ruleSet_.push_back(&MaybePerfect::doCenter);
+    ruleSet_.push_back(&MaybePerfect::doOppositeCorner);
+    ruleSet_.push_back(&MaybePerfect::doEmptyCorner);
+    ruleSet_.push_back(&MaybePerfect::doEmptySide);
 }
 
-int Newell_Simon::move(const char* state)
+int MaybePerfect::move(const char* state)
 {
     for(auto rule:ruleSet_){
         int theMove = rule(this,state);
@@ -61,7 +62,9 @@ int Newell_Simon::move(const char* state)
         return game::getPos(state, game::MARK_E, i, j, k); \
     }
 
-int Newell_Simon::doWin(const char* state)
+
+//if we have two-in-a-row, just fill the last piece
+int MaybePerfect::doWin(const char* state)
 {
     DEBUG("in doWin");
 
@@ -81,7 +84,9 @@ int Newell_Simon::doWin(const char* state)
     return game::INVALID;
 }
 
-int Newell_Simon::doBlockWin(const char* state)
+
+//if the opponent has two-in-a-row, just block the last piece
+int MaybePerfect::doBlockWin(const char* state)
 {
     DEBUG("in doBlock");
 
@@ -102,7 +107,8 @@ int Newell_Simon::doBlockWin(const char* state)
 
 
 
-int Newell_Simon::doFork(const char* state)
+//set up two two-in-a-row situation
+int MaybePerfect::doFork(const char* state)
 {
     DEBUG("in doFork");
 
@@ -116,7 +122,9 @@ int Newell_Simon::doFork(const char* state)
     return game::INVALID;
 }
 
-int Newell_Simon::doBlockFork(const char* state)
+
+//block opponent's potential fork
+int MaybePerfect::doBlockFork(const char* state)
 {
     DEBUG("in doBlockFork");
 
@@ -131,9 +139,9 @@ int Newell_Simon::doBlockFork(const char* state)
 }
 
 
-//check opponent's reaction after setup two-in-a-row
-//if opponent cannot use block to create his fork
-//the setup is a valid move
+//check opponent's reaction after creating two-in-a-row
+//if opponent cannot use block to create its fork at the same time
+//then we have a valid move
 #define MAKE_CONNECT_TWO(state, i, j, k, numX, numO, numE) \
     if(game::matchCount(state, i, j, k, numX, numO, numE)){ \
         int emptyPos = game::getPos(state, game::MARK_E, i, j, k); \
@@ -145,7 +153,9 @@ int Newell_Simon::doBlockFork(const char* state)
         } \
     }\
 
-int Newell_Simon::doConnectTwo(const char* state)
+
+//create two-in-a-row
+int MaybePerfect::doConnectTwo(const char* state)
 {
     DEBUG("in doConnectTwo");
     int numX = 0, numO = 2, numE = 1;
@@ -168,7 +178,9 @@ int Newell_Simon::doConnectTwo(const char* state)
     return game::INVALID;
 }
 
-int Newell_Simon::doCenter(const char* state)
+
+//play center, if it is available
+int MaybePerfect::doCenter(const char* state)
 {
     DEBUG("in doCenter");
     if(state[4] == game::MARK_E)
@@ -176,11 +188,13 @@ int Newell_Simon::doCenter(const char* state)
     return game::INVALID;
 }
 
+
 #define OPPOSITE_CORNER(state, i, j) \
     if(state[i] == opponentMark_ && state[j] == game::MARK_E) \
         return j; \
 
-int Newell_Simon::doOppositeCorner(const char* state)
+
+int MaybePerfect::doOppositeCorner(const char* state)
 {
     DEBUG("in doOppositeCorner");
     OPPOSITE_CORNER(state, 0, 8);
@@ -190,6 +204,8 @@ int Newell_Simon::doOppositeCorner(const char* state)
     return game::INVALID;
 }
 
+
+// make AI more volatile
 #define ASSIGN_POS_RANDOMLY(state, vec, i, j, k, l) \
     if(state[i] == game::MARK_E) vec.push_back(i); \
     if(state[j] == game::MARK_E) vec.push_back(j); \
@@ -201,7 +217,7 @@ int Newell_Simon::doOppositeCorner(const char* state)
         return vec.at(util::uniformRand(0,vec.size()-1)); \
 
 
-int Newell_Simon::doEmptyCorner(const char* state)
+int MaybePerfect::doEmptyCorner(const char* state)
 {
     DEBUG("in doEmptyCorner");
     std::vector<int> vec;
@@ -209,7 +225,8 @@ int Newell_Simon::doEmptyCorner(const char* state)
     return game::INVALID;
 }
 
-int Newell_Simon::doEmptySide(const char* state)
+
+int MaybePerfect::doEmptySide(const char* state)
 {
     DEBUG("in doEmptySide");
     std::vector<int> vec;
@@ -219,3 +236,26 @@ int Newell_Simon::doEmptySide(const char* state)
 
 
 }//namespace
+
+
+/* test cases
+ *
+ *  //doWin
+    //gameInstance.loadBoard("oo~xx~x~~");
+
+    //doBlock
+    //gameInstance.loadBoard("~oxx~ox~~");
+
+    //doFork, ai: x
+    //gameInstance.loadBoard("~~oox~x~~");
+
+    //doBlockFork, ai:x
+    //gameInstance.loadBoard("~~xxo~o~~");
+
+    //doConnectTwo, ai:o
+    //gameInstance.loadBoard("~~x~o~x~~");
+
+    //gameInstance.loadBoard("x~ooxxx~o");
+ */
+
+

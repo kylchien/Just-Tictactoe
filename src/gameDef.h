@@ -41,7 +41,7 @@ void rotateCW90(const char* src, char* target);
 void mirror(const char* src, char* target);
 
 //Player related:
-enum class PlayerType{Human, Minimax, Newell_Simon};
+enum class PlayerType{Human, Minimax, MaybePerfect};
 class Player;
 Player* createPlayer(PlayerType type, char mark);
 

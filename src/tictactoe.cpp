@@ -20,7 +20,6 @@ TicTacToe::~TicTacToe()
 void TicTacToe::setGameMode(int mode)
 {
     gameMode_ = static_cast<GameMode>(mode);
-    qDebug() << "set game mode to " << static_cast<int>(gameMode_);
 }
 
 
@@ -51,24 +50,20 @@ void TicTacToe::initialize()
         break;
 
     case GameMode::HM:
-        playerX_ = new Player(MARK_X);
-        //playerO_ = new ai::Minimax(MARK_O);
-
-        playerO_ = new ai::Newell_Simon(MARK_O);
+        playerX_ = createPlayer(PlayerType::Human, MARK_X);
+        playerO_ = createPlayer(PlayerType::MaybePerfect, MARK_O);
         connectPlayer(playerO_);
         break;
 
     case GameMode::MH:
-        playerO_ = new Player(MARK_O);
-        //playerX_ = new ai::Minimax(MARK_X);
-        playerX_ = new ai::Newell_Simon(MARK_X);
+        playerO_ = createPlayer(PlayerType::Human, MARK_O);
+        playerX_ = createPlayer(PlayerType::MaybePerfect, MARK_X);
         connectPlayer(playerX_);
         break;
 
     case GameMode::MM:
-        //playerX_ = new ai::Minimax(MARK_X);
-        playerX_ = new ai::Newell_Simon(MARK_X);
-        playerO_ = new ai::Minimax(MARK_O);
+        playerX_ = createPlayer(PlayerType::MaybePerfect, MARK_X);
+        playerO_ = createPlayer(PlayerType::Minimax, MARK_O);
         connectPlayer(playerX_);
         connectPlayer(playerO_);
         break;

@@ -2,7 +2,7 @@
 #define AI_H
 
 #include "minimax.h"
-#include "Newell_Simon.h"
+#include "maybePerfect.h"
 
 
 #endif // AI

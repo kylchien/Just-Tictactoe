@@ -135,3 +135,10 @@ float Minimax::minimax(const char* state, int depth, bool isMax)
 
 
 }
+
+
+/* test case:
+ *
+ *  //depth testing, ai:o
+    //gameInstance.loadBoard("~x~~~xoox");
+ */

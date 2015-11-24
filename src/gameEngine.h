@@ -20,7 +20,6 @@ public:
     void updateBoard(int pos);
     void loadBoard(std::string board);
 
-
     //virtual void run();
 
 protected:
@@ -36,7 +35,6 @@ protected:
     void allocDefaultPlayers();
     void deallocPlayers();
     void restart();
-
 };
 
 
