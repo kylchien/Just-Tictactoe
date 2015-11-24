@@ -1,7 +1,6 @@
 # Just-Tictactoe
 <body>
-Yet another Tic-Tac-Toe game...(?) <br>
-that practices several AI techniques:<br>
+Just a Tic-Tac-Toe game with classic AI algorithm practices.<br>
 
 So far it supports:<br>
 - Newell and Simon's algorithm (1972)
