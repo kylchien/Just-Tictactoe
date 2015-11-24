@@ -12,6 +12,6 @@ So far it supports:<br>
 
 Using Qt 5.5 and QML
 
-<img src="http://i124.photobucket.com/albums/p24/moneypig/tictactoe.jpg" height=450>
+<img src="http://i124.photobucket.com/albums/p24/moneypig/Untitled-1.jpg" height=450>
 </body>
 
