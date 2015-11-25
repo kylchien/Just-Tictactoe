@@ -7,7 +7,7 @@ So far it supports:<br>
 - Minimax
 
 
-... more are coming
+... more are coming (alpha-beta, Q-Learning, ANN)
 
 Using Qt 5.5 and QML
 
