@@ -3,7 +3,7 @@
 Just a Tic-Tac-Toe game with classic AI algorithm practices.<br>
 
 So far it supports:<br>
-- MaybePerfect (Newell and Simon's algorithm, 1972)
+- MaybePerfect (Newell and Simon's algorithm)
 - Minimax
 
 
