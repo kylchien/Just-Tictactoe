@@ -1,9 +1,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <QJsonObject>
 #include <QString>
 
-class Config
+namespace io{
+
+class Config final
 {
 public:
     Config();
@@ -12,7 +15,12 @@ public:
     ~Config();
 
     void load();
+	QString operator[](QString key) const;
+
+private:
+	QJsonObject json_;
 
 };
 
+}
 #endif // CONFIG_H

@@ -1,11 +1,12 @@
 #include "maybePerfect.h"
 #include "../gameDef.h"
-#include "../utility.h"
+#include "../util/utility.h"
 #include <QDebug>
+
+#include "../playerFactory.h"
 
 //#define DEBUG_FLAG
 
-//debugging macro
 #ifdef DEBUG_FLAG
     #define DEBUG(msg) \
         qDebug() << msg;
@@ -15,24 +16,27 @@
 
 namespace ai{
 
+
+
 //initialize class static vector
 using Function = std::function<int(MaybePerfect*, const char*)>;
 std::vector<Function> MaybePerfect::ruleSet_;
 
 MaybePerfect::MaybePerfect(char mark):Player(mark)
 {
-    initialize();
+    initRules();
 }
+
 
 MaybePerfect::~MaybePerfect()
 {}
 
 
-void MaybePerfect::initialize()
+void MaybePerfect::initRules()
 {
     ruleSet_.clear();
 
-    //rule order matters (priority from high to low)
+    //rule order matters: priority from high to low
     ruleSet_.push_back(&MaybePerfect::doWin);
     ruleSet_.push_back(&MaybePerfect::doBlockWin);
     ruleSet_.push_back(&MaybePerfect::doFork);
@@ -63,7 +67,7 @@ int MaybePerfect::move(const char* state)
     }
 
 
-//if we have two-in-a-row, just fill the last piece
+//if we have two-in-a-row, just put the last piece for checkmate
 int MaybePerfect::doWin(const char* state)
 {
     DEBUG("in doWin");
@@ -107,7 +111,7 @@ int MaybePerfect::doBlockWin(const char* state)
 
 
 
-//set up two two-in-a-row situation
+//set up 2x fork(two-in-a-row) situation
 int MaybePerfect::doFork(const char* state)
 {
     DEBUG("in doFork");
@@ -140,7 +144,7 @@ int MaybePerfect::doBlockFork(const char* state)
 
 
 //check opponent's reaction after creating two-in-a-row
-//if opponent cannot use block to create its fork at the same time
+//if opponent cannot block and create its fork at the same time
 //then we have a valid move
 #define MAKE_CONNECT_TWO(state, i, j, k, numX, numO, numE) \
     if(game::matchCount(state, i, j, k, numX, numO, numE)){ \

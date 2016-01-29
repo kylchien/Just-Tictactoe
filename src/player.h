@@ -2,22 +2,25 @@
 #define PLAYER_H
 
 #include <QObject>
+#include <QString>
 
 namespace game{
-
 
 class Player : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Player(char mark);
-    virtual ~Player();
+
+	explicit Player(char mark);
+	virtual ~Player();
 
     Player(const Player& src) = delete;
     Player& operator= (const Player& src) = delete;
 
     virtual int move(const char* state);
+	virtual QString getType() const
+	{ return QString("Player"); }
 
 signals:
     void sendMove(int pos);
@@ -28,9 +31,10 @@ public slots:
 protected:
     char selfMark_;
     char opponentMark_;
-
-
+	
 };
+
+
 
 
 }

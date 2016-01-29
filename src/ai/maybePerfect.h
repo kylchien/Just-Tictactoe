@@ -20,15 +20,17 @@ class MaybePerfect final: public game::Player
 public:
     explicit MaybePerfect(char mark);
     ~MaybePerfect();
-
+	
     int move(const char* state);
+	
+	virtual QString getType() const
+	{ return QString("MaybePerfect"); }
 
 protected:
-
     using Function = std::function<int(MaybePerfect*, const char*)>;
     static std::vector<Function> ruleSet_;
 
-    void initialize();
+    void initRules();
     int doWin(const char* state);
     int doBlockWin(const char* state);
     int doFork(const char* state);

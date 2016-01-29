@@ -1,7 +1,7 @@
 #include "gamedef.h"
 #include <cstdlib>
 #include <cstring>
-#include "ai/ai.h"
+//#include "ai/ai.h"
 #include <QDebug>
 
 namespace game{
@@ -55,37 +55,21 @@ void push3(std::vector<int>& vec, int i, int j, int k)
     vec.push_back(k);
 }
 
-/*
-Outcome outcome(const char* state, std::vector<int>& winPos)
+
+bool isWon(const char* state)
 {
-    Outcome o = Outcome::NIL;
-
-    for(int i=0; i<3; ++i){
-        //column check
-        if(state[i] != MARK_E && state[i] == state[i+3] && state[i] == state[i+6]){
-            push3(winPos, i, i+3, i+6);
-            o = (state[i] == MARK_X)?(Outcome::XWIN):(Outcome::OWIN);
-        }
-
-        //row check
-        if(state[3*i] != MARK_E && state[3*i] == state[3*i+1] && state[3*i] == state[3*i+2]){
-            push3(winPos, 3*i, 3*i+1, 3*i+2);
-            o = (state[3*i] == MARK_X)?(Outcome::XWIN):(Outcome::OWIN);
-        }
+	for(int i=0; i<3; ++i){
+        if(state[i] != MARK_E && state[i] == state[i+3] && state[i] == state[i+6])
+            return true;
+        if(state[3*i] != MARK_E && state[3*i] == state[3*i+1] && state[3*i] == state[3*i+2])
+            return true;
     }
-    //diagonal check
-    if(state[0] != MARK_E && state[0] == state[4] && state[0] == state[8]){
-        push3(winPos, 0,4,8);
-        o = (state[0] == MARK_X)?(Outcome::XWIN):(Outcome::OWIN);
-    }
-    if(state[2] != MARK_E && state[2] == state[4] && state[2] == state[6]){
-        push3(winPos, 2,4,6);
-        o = (state[2] == MARK_X)?(Outcome::XWIN):(Outcome::OWIN);
-    }
-
-    return o;
-}*/
-
+    if(state[0] != MARK_E && state[0] == state[4] && state[0] == state[8])
+        return true;
+    if(state[2] != MARK_E && state[2] == state[4] && state[2] == state[6])
+        return true;
+    return false;
+}
 
 bool isWon(const char* state, std::vector<int>& winPos)
 {
@@ -115,6 +99,7 @@ bool isWon(const char* state, std::vector<int>& winPos)
     return false;
 }
 
+
 bool isWon(const char* state, char mark){
     for(int i=0; i<3; ++i){
         if(state[i] == mark && state[i] == state[i+3] && state[i] == state[i+6])
@@ -128,6 +113,103 @@ bool isWon(const char* state, char mark){
         return true;
     return false;
 }
+
+
+bool matchHorizon(const char* state, int i)
+{
+    return state[3*i]==state[3*i+1] && state[3*i]==state[3*i+2];
+}
+
+bool matchVertical(const char* state, int i)
+{
+    return state[i]==state[i+3] && state[i]==state[i+6];
+}
+
+bool matchDiagonal(const char* state, int i)
+{
+    if(i==0)
+        return state[0]==state[4] && state[0]==state[8];
+    else
+        return state[2]==state[4] && state[2]==state[6];
+}
+
+/*
+bool isWon(const char* state){
+    for(int i=0; i<3; ++i)
+        if(matchHorizon(state,i) || matchVertical(state,i))
+            return true;
+    return (matchDiagonal(state,0) || matchDiagonal(state,1));
+}*/
+
+
+bool isWon(const char* state, int pos)
+{
+    switch (pos){
+        case 0:
+            if( (state[0] == state[1] && state[0] == state[2]) ||
+                (state[0] == state[3] && state[0] == state[6]) ||
+                (state[0] == state[4] && state[0] == state[8]) )
+                return true;
+            return false;
+
+        case 1:
+            if( (state[0] == state[1] && state[0] == state[2]) ||
+                (state[1] == state[4] && state[1] == state[7]) )
+                return true;
+            return false;
+
+        case 2:
+            if( (state[0] == state[1] && state[0] == state[2]) ||
+                (state[2] == state[5] && state[2] == state[8]) ||
+                (state[2] == state[4] && state[2] == state[6]) )
+                return true;
+            return false;
+
+        case 3:
+            if( (state[3] == state[4] && state[3] == state[5]) ||
+                (state[0] == state[3] && state[0] == state[6]) )
+                return true;
+            return false;
+
+        case 4:
+            if( (state[3] == state[4] && state[3] == state[5]) ||
+                (state[1] == state[4] && state[1] == state[7]) ||
+                (state[0] == state[4] && state[0] == state[8]) ||
+                (state[2] == state[4] && state[2] == state[6]) )
+                return true;
+            return false;
+
+        case 5:
+            if( (state[2] == state[5] && state[2] == state[8]) ||
+                (state[3] == state[4] && state[3] == state[5]) )
+                return true;
+            return false;
+
+        case 6:
+            if( (state[0] == state[3] && state[0] == state[6]) ||
+                (state[6] == state[7] && state[6] == state[8]) ||
+                (state[2] == state[4] && state[2] == state[6]) )
+                return true;
+            return false;
+
+        case 7:
+            if( (state[1] == state[4] && state[1] == state[7]) ||
+                (state[6] == state[7] && state[6] == state[8]) )
+                return true;
+            return false;
+
+        case 8:
+            if( (state[2] == state[5] && state[2] == state[8]) ||
+                (state[6] == state[7] && state[6] == state[8]) ||
+                (state[0] == state[4] && state[0] == state[8]) )
+                return true;
+            return false;
+
+        default:
+            return false;
+    }
+}
+
 
 bool isFull(const char* state)
 {
@@ -223,6 +305,7 @@ void mirror(const char* src, char* target)
     }
 }
 
+/*
 Player* createPlayer(PlayerType type, char mark)
 {
     Player* p = nullptr;
@@ -239,7 +322,7 @@ Player* createPlayer(PlayerType type, char mark)
         break;
     }
     return p;
-}
+}*/
 
 
 

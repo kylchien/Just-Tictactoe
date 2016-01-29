@@ -3,7 +3,7 @@
 
 #include "minimax.h"
 #include "maybePerfect.h"
-
+#include "negmax.h"
 
 #endif // AI
 

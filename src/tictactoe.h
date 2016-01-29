@@ -2,14 +2,21 @@
 #define TICTACTOE_H
 
 #include "gameEngine.h"
+
 #include <QObject>
 #include <QVariant>
 
-
+/*
+ *  Event Loop:
+ *  sendMove(signal) -> updateBoard(slot) ->
+ *  notifyPlayer(signal) -> makeMove(slot) ->
+ */
 
 namespace game{
 
+//forward declaration
 class Player;
+enum class PlayerType: int;
 
 class TicTacToe : public QObject, public GameEngine
 {
@@ -22,14 +29,15 @@ public:
     ~TicTacToe();
 
     Q_INVOKABLE void restart();
-    Q_INVOKABLE void initialize();
+    Q_INVOKABLE void createPlayers();
     Q_INVOKABLE void setGameMode(int mode);
     Q_INVOKABLE void notifyPlayers();
     Q_INVOKABLE bool isHumanTurn() const;
     Q_INVOKABLE QChar getCurrentTurn() const;
     void loadBoard(std::string boardInfo);
-    TicTacToe& rotateCW90();
-    TicTacToe& mirror();
+
+    TicTacToe& rotateCW90(); //using build pattern for testing
+    TicTacToe& mirror();     // same as above
 
 signals:
     void boardChanged(int pos, char mark);
@@ -50,7 +58,7 @@ private:
     GameMode gameMode_;
     QVariantList list_;
 
-    void connectPlayer(Player* p);
+    Player* createAIPlayer(QString type, char mark);
 
 };
 

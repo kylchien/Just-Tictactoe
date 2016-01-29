@@ -6,13 +6,14 @@ Item {
     property alias tick: tickSound
     property alias finish: finishSound
 
+    /* disable for now
     Audio {
         id: bgm
         source: "../asset/VacationUke.mp3"
         autoPlay: true
         loops: Audio.Infinite
         volume: 0.7
-    }
+    }*/
 
     Audio {
         id: blopSound

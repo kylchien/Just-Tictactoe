@@ -1,8 +1,9 @@
 #include "tictactoe.h"
+#include "playerFactory.h"
 #include "player.h"
-#include "ai/ai.h"
 #include <QtDebug>
 
+#include "./ai/ai.h"
 
 
 namespace game{
@@ -14,7 +15,7 @@ TicTacToe::TicTacToe()
 
 TicTacToe::~TicTacToe()
 {
-    GameEngine::deallocPlayers();
+    GameEngine::deletePlayers();
 }
 
 void TicTacToe::setGameMode(int mode)
@@ -25,56 +26,56 @@ void TicTacToe::setGameMode(int mode)
 
 void TicTacToe::restart()
 {
-    for(char& c: board_)
-        c = MARK_E;
-
-    GameEngine::allocDefaultPlayers();
-    curTurn_ = MARK_X;
+    //for(char& c: board_)
+    //    c = MARK_E;
+    //curTurn_ = MARK_X;
+	GameEngine::restart();
+	
+    deletePlayers();    //remember to cleanup first...
+    createHumanPlayers();
     gameMode_ = GameMode::HH;
     list_.clear();
 }
 
-void TicTacToe::connectPlayer(Player* p)
+
+Player* TicTacToe::createAIPlayer(QString type, char mark)
 {
-    connect(this, &TicTacToe::notifyPlayer,
-            p, &Player::makeMove);
-    connect(p, &Player::sendMove,
-            this, &TicTacToe::updateBoard);
+    Player* p = PlayerFactory::create(type, mark);
+	connect(this, &TicTacToe::notifyPlayer, p, &Player::makeMove);
+    connect(p, &Player::sendMove, this, &TicTacToe::updateBoard);
+    return p;
 }
 
-void TicTacToe::initialize()
+void TicTacToe::createPlayers()
 {
+	deletePlayers();
     switch(gameMode_){
     case GameMode::HH:
-        GameEngine::allocDefaultPlayers();
+        GameEngine::createHumanPlayers();
         break;
 
     case GameMode::HM:
-        playerX_ = createPlayer(PlayerType::Human, MARK_X);
-        playerO_ = createPlayer(PlayerType::MaybePerfect, MARK_O);
-        connectPlayer(playerO_);
+		playerX_ = PlayerFactory::create("Player", MARK_X);
+        playerO_ = createAIPlayer("Minimax", MARK_O);
         break;
 
     case GameMode::MH:
-        playerO_ = createPlayer(PlayerType::Human, MARK_O);
-        playerX_ = createPlayer(PlayerType::MaybePerfect, MARK_X);
-        connectPlayer(playerX_);
-        break;
+        playerO_ = PlayerFactory::create("Player", MARK_O);
+        playerX_ = createAIPlayer("MaybePerfect", MARK_X);
+		break;
 
     case GameMode::MM:
-        playerX_ = createPlayer(PlayerType::MaybePerfect, MARK_X);
-        playerO_ = createPlayer(PlayerType::Minimax, MARK_O);
-        connectPlayer(playerX_);
-        connectPlayer(playerO_);
-        break;
+        playerX_ = createAIPlayer("Negmax", MARK_X);
+        playerO_ = createAIPlayer("MaybePerfect", MARK_O);
+		break;
 
     default:
         qFatal("unknown game mode!!!");
         break;
     }
 
-    curTurn_ = determineTurn(board_);
-    notifyPlayers();
+    curTurn_ = determineTurn(board_);   //due to loadBoard utility, we need to re-detect current turn
+    notifyPlayers();                    //start the event loop
 }
 
 void TicTacToe::notifyPlayers()

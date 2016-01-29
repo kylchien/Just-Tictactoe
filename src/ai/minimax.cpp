@@ -1,45 +1,34 @@
 #include "minimax.h"
-#include "../utility.h"
-#include "../tictactoe.h"
+#include "../gameDef.h"
+#include "../util/utility.h"
 #include <algorithm>
 #include <QDebug>
-#include <fstream>
 
 
 using std::vector;
 using std::max;
 using std::min;
 
-static bool DEBUG = true;
-
-bool approxEqual(float f1, float f2, float epsilon)
-{
-    float diff = ((f1 - f2)>0)?(f1 - f2):((f1 - f2)*-1);
-    return diff < epsilon;
-}
-
-//std::ofstream stream;
+static bool DEBUG = false;
 
 namespace ai{
 
 Minimax::Minimax(char mark, bool randomForTie)
     :Player(mark), random_(randomForTie)
-{
-    //std::string s="C:\\Users\\m0neyp1g\\Desktop\\see.txt";
-    //stream.open(s);
-}
-
+{}
 
 Minimax::~Minimax()
-{
-    //stream.close();
-}
+{}
 
+bool Minimax::approxEqual(float f1, float f2, float epsilon)
+{
+    float diff = ((f1 - f2)>0)?(f1 - f2):((f1 - f2)*-1);
+    return diff < epsilon;
+}
 
 
 int Minimax::move(const char* state)
 {
-
     vector<char*> futStates;
     game::allocNextStates(selfMark_, state, futStates);
 
@@ -51,8 +40,7 @@ int Minimax::move(const char* state)
         int pos = (int)futState[game::BOARD_SIZE];
         float val = minimax(futState, MAX_DEPTH-1, false);
 
-        if(DEBUG)
-            qDebug() << "pos:" << pos << ", val:" << val;
+        if(DEBUG) qDebug() << "pos:" << pos << ", val:" << val;
 
         if(random_ && approxEqual(val, best, EPSILON)){
             tieBreaker_.push_back(pos);
@@ -63,27 +51,24 @@ int Minimax::move(const char* state)
             best = val;
             bestPos = pos;
 
-            //first evaluation always beats the best(which is -ininity)
-            //we want to put it to tieBreaker as well
-            if(i == 0)
-                tieBreaker_.push_back(pos);
+            if(i == 0)                        	//first evaluation always beats the best(which is -ininity)
+                tieBreaker_.push_back(pos);		//we want to put it to tieBreaker as well
             else
                 tieBreaker_.clear();
         }
     }
 
     if(random_ && !tieBreaker_.empty()){
-        if(DEBUG)
+        if(DEBUG){
             for(int index : tieBreaker_)
                 qDebug() << "tieBreaker:" << index;
-
+		}
         int index = util::uniformRand(0,tieBreaker_.size()-1);
         bestPos = tieBreaker_[index];
         tieBreaker_.clear();
     }
 
-    if(DEBUG)
-        qDebug() << "best pos:" << bestPos << "\n";
+    if(DEBUG) qDebug() << "best pos:" << bestPos << "\n";
 
     game::deallocNextStates(futStates);
     return bestPos;
@@ -105,11 +90,8 @@ float Minimax::minimax(const char* state, int depth, bool isMax)
         return LOSE - depth*DEPTH_ADJ + centerAdj;
     }
     if(game::isFull(state) || depth == 0){
-        //int sign = (isMax)?1:-1;
-        //return DRAW + sign*(depth*DEPTH_ADJ);
         return DRAW + centerAdj;
     }
-
 
     vector<char*> futStates;
     if(isMax)

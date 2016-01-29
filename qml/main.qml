@@ -19,7 +19,7 @@ ApplicationWindow {
     Image {
         id: boardImage
         source: "../asset/board.png"
-        opacity: 0.5
+        opacity: 1.0
         anchors.centerIn: parent
 
     }
@@ -197,10 +197,10 @@ ApplicationWindow {
 
     function handleGridClick(index)
     {
-        //prohibt click signal triggers after game over
+        //1.prohibt click signal triggers after game over
+        //2.prohibt user quick click before AI moves
         if(messageDisplay.visible == false &&
             optionWindow.visible == false){
-            //prohibt user quickly clicks before AI moves
             if(game.isHumanTurn()){
                 game.updateBoard(index);
             }

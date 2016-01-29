@@ -66,7 +66,7 @@ Window {
                 }
             }
             optionWindow.close()
-            gameWindow.game.initialize()
+            gameWindow.game.createPlayers()
 
         }
         style: ButtonStyle{
