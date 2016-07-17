@@ -2,21 +2,37 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-CONFIG += c++11 console
+#CONFIG += c++14 console
+CONFIG += c++14
+
+INCLUDEPATH += \
+    $$PWD/src/util \
+    $$PWD/src/io \
+    $$PWD/src
 
 SOURCES += \
-    src/util/utility.cpp \
-    src/main.cpp \
-    src/tictactoe.cpp \
-    src/player.cpp \
-    src/gameEngine.cpp \
-    src/gameDef.cpp \
-    src/playerFactory.cpp \
+    src/util/random.cpp \
     src/io/config.cpp \
-    src/io/save.cpp \
-    src/ai/maybePerfect.cpp \
-    src/ai/minimax.cpp \
-    src/ai/negmax.cpp
+    src/io/jsonReader.cpp \
+    src/io/simpleWriter.cpp \
+    src/io/simpleReader.cpp \
+    src/agent/maybePerfect.cpp \
+    src/agent/agentFactoryImpl.cpp \
+    src/agent/agentFactory.cpp \
+    src/agent/minimax.cpp \
+    src/agent/negmax.cpp \
+    src/player.cpp \
+    src/engine.cpp \
+    src/engineImpl.cpp \
+    src/viewModel.cpp \  
+    src/main.cpp \
+    src/gameUtil.cpp \
+    src/lookupTable.cpp \
+    src/agent/qLearning.cpp \
+    src/stateInfo.cpp
+
+
+
 
 
 RESOURCES += qml.qrc \
@@ -29,18 +45,37 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    src/util/utility.h \
-    src/tictactoe.h \
-    src/player.h \
-    src/ai/ai.h \
-    src/ai/minimax.h \
-    src/gameEngine.h \
-    src/gameDef.h \
-    src/ai/maybePerfect.h \
-    src/playerFactory.h \
+    src/util/runtimeEx.h \
+    src/util/random.h \
+    src/util/timer.h \
+    src/io/simpleWriter.h \
+    src/io/simpleReader.h \
+    src/io/jsonReader.h \
     src/io/config.h \
-    src/io/save.h \
-    src/ai/negmax.h
+    src/gameDef.h \
+    src/agent/agent.h \
+    src/agent/agents.h \
+    src/agent/maybePerfect.h \
+    src/agent/minimax.h \
+    src/agent/negmax.h \
+    src/agent/agentFactory.h \
+    src/agent/agentFactoryImpl.h \
+    src/player.h \
+    src/engine.h \
+    src/engineImpl.h \
+    src/viewModel.h \
+    src/gameUtil.h \
+    src/lookupTable.h \
+    src/agent/qLearning.h \
+    src/stateInfo.h
+
+
+
+
+
+
+
+    
 
 DISTFILES += \
     src/todo.txt

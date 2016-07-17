@@ -1,5 +1,6 @@
 #include "negmax.h"
 #include "../gameDef.h"
+#include "../gameUtilFunc.h"
 #include "../util/utility.h"
 
 #include <algorithm>

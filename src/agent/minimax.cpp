@@ -1,9 +1,9 @@
-#include "minimax.h"
-#include "../gameDef.h"
-#include "../util/utility.h"
-#include <algorithm>
-#include <QDebug>
+#include "Minimax.h"
+#include "gameDef.h"
+#include "gameUtil.h"
+#include "util/random.h"
 
+#include <QDebug>
 
 using std::vector;
 using std::max;
@@ -11,34 +11,33 @@ using std::min;
 
 static bool DEBUG = false;
 
-namespace ai{
+namespace agent{
 
 Minimax::Minimax(char mark, bool randomForTie)
-    :Player(mark), random_(randomForTie)
+    :Agent(mark), random_(randomForTie)
 {}
 
 Minimax::~Minimax()
 {}
 
-bool Minimax::approxEqual(float f1, float f2, float epsilon)
+bool Minimax::approxEqual(double f1, double f2, double epsilon)
 {
-    float diff = ((f1 - f2)>0)?(f1 - f2):((f1 - f2)*-1);
+    double diff = ((f1 - f2)>0)?(f1 - f2):((f1 - f2)*-1);
     return diff < epsilon;
 }
 
 
 int Minimax::move(const char* state)
 {
-    vector<char*> futStates;
-    game::allocNextStates(selfMark_, state, futStates);
+    game::NextStates nextStates(selfMark_, state);
 
-    float best = -INFI;
+    double best = -INF;
     int bestPos = -1;
-    for(unsigned int i =0; i<futStates.size(); ++i){
 
-        char* futState = futStates.at(i);
+    for(std::size_t i =0; i < nextStates.size(); ++i){
+        char* futState = nextStates.at(i);
         int pos = (int)futState[game::BOARD_SIZE];
-        float val = minimax(futState, MAX_DEPTH-1, false);
+        double val = minimax(futState, MAX_DEPTH-1, false);
 
         if(DEBUG) qDebug() << "pos:" << pos << ", val:" << val;
 
@@ -51,8 +50,10 @@ int Minimax::move(const char* state)
             best = val;
             bestPos = pos;
 
-            if(i == 0)                        	//first evaluation always beats the best(which is -ininity)
-                tieBreaker_.push_back(pos);		//we want to put it to tieBreaker as well
+            //first evaluation always beats the best(which is -ininity)
+            //we want to put it to tieBreaker as well
+            if(i == 0)
+                tieBreaker_.push_back(pos);
             else
                 tieBreaker_.clear();
         }
@@ -62,22 +63,21 @@ int Minimax::move(const char* state)
         if(DEBUG){
             for(int index : tieBreaker_)
                 qDebug() << "tieBreaker:" << index;
-		}
-        int index = util::uniformRand(0,tieBreaker_.size()-1);
+        }
+        int index = util::Random::uniformInt(0,tieBreaker_.size()-1);
         bestPos = tieBreaker_[index];
         tieBreaker_.clear();
     }
 
     if(DEBUG) qDebug() << "best pos:" << bestPos << "\n";
 
-    game::deallocNextStates(futStates);
     return bestPos;
 }
 
 
-float Minimax::minimax(const char* state, int depth, bool isMax)
+double Minimax::minimax(const char* state, int depth, bool isMax)
 {
-    float centerAdj = 0;
+    double centerAdj = 0;
     if(state[4]== selfMark_)
         centerAdj = CENTER_ADJ;
     else if(state[4] == opponentMark_)
@@ -93,25 +93,21 @@ float Minimax::minimax(const char* state, int depth, bool isMax)
         return DRAW + centerAdj;
     }
 
-    vector<char*> futStates;
-    if(isMax)
-        game::allocNextStates(selfMark_, state, futStates);
-    else
-        game::allocNextStates(opponentMark_, state, futStates);
+    char mark = isMax?selfMark_:opponentMark_;
+    game::NextStates nextStates(mark, state);
+    std::size_t size = nextStates.size();
+    double best;
 
-    float best;
     if(isMax){
-        best = -INFI;
-        for(auto futState : futStates)
-            best = max(best, minimax(futState, depth-1, false));
-    }
-    else{
-        best = INFI;
-        for(auto futState : futStates)
-            best = min(best, minimax(futState, depth-1, true));
+        best = -INF;
+        for(std::size_t idx = 0; idx < size; ++idx)
+            best = max(best, minimax(nextStates.at(idx), depth-1, false));
+    }else{
+        best = INF;
+        for(std::size_t idx = 0; idx < size; ++idx)
+            best = min(best, minimax(nextStates.at(idx), depth-1, true));
     }
 
-    game::deallocNextStates(futStates);
     return best;
 }
 

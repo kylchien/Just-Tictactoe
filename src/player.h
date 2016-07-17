@@ -1,10 +1,15 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef Player_H
+#define Player_H
+
+#include "agent/agent.h"
+
+#include <memory>
 
 #include <QObject>
 #include <QString>
 
 namespace game{
+
 
 class Player : public QObject
 {
@@ -12,30 +17,37 @@ class Player : public QObject
 
 public:
 
-	explicit Player(char mark);
-	virtual ~Player();
+    explicit Player(char mark);
+    ~Player();
 
     Player(const Player& src) = delete;
     Player& operator= (const Player& src) = delete;
 
-    virtual int move(const char* state);
-	virtual QString getType() const
-	{ return QString("Player"); }
+    QString getAgentType() const;
 
+    void setAgent(std::unique_ptr<agent::Agent> a);
+	
+    //inline std::unique_ptr<agent::Agent>& getAgent()
+    //{ return agent_; }
+
+	int move(const char* state);
+	
 signals:
-    void sendMove(int pos);
+    void sendingMove(int pos);
 
 public slots:
-    void makeMove(char mark, const char* state);
+    void makingMove(char mark, const char* state);
 
-protected:
+
+private:
     char selfMark_;
-    char opponentMark_;
-	
+    std::unique_ptr<agent::Agent> agent_;
 };
 
 
 
 
-}
-#endif // PLAYER_H
+
+
+}//namespace game
+#endif // Player_H

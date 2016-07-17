@@ -1,8 +1,7 @@
-#ifndef GAMEDEF
-#define GAMEDEF
+#ifndef GAMEDEF_H
+#define GAMEDEF_H
 
-#include <vector>
-
+#include <QString>
 
 namespace game{
 
@@ -16,48 +15,27 @@ static constexpr char MARK_E = '~';
 
 enum class GameMode{HH = 0, HM = 1, MH = 2, MM = 3};
 
+static QString GAME_CONFIG_PATH = "C:\\Project\\Just-Tictactoe\\game.config";
+//static QString GAME_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\game.config";
+
+static QString QLEARNING_CONFIG_PATH = "C:\\Project\\Just-Tictactoe\\qLearning.config";
+//static QString QLEARNING_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\qLearning.config";
 
 
-void copyBoard(const char* src, char* tgt);
-char determineTurn(const char* curState);
-
-//need to call dealloc in pair
-void allocNextStates(char mark, const char* curState, std::vector<char*>& futStates);
-void deallocNextStates(std::vector<char*>& futStates);
-
-
-//if winning, output the positions where marks are connected in a row in winPos
-bool isWon(const char* state);
-bool isWon(const char* state, std::vector<int>& winPos);
-bool isWon(const char* state, int pos);
-bool isWon(const char* state, char mark); //used by minimax
-bool isFull(const char* state);
+static QString NUM_OF_GAMES = "num_of_games";
+static QString PLAYER_X = "player_x";
+static QString PLAYER_O = "player_o";
+static QString SAVE_GAME_MODE = "save_game_mode";
+static QString SAVE_DATA_PATH = "save_data_path";
+static QString SAVE_BATCH_SIZE = "save_batch_size";
 
 
-//check in the positions i,j,k, the number of O, the number of X, the number of empty, 
-//do match the given countX, countO, countE, respectively
-//if so return true, otherwise return false
-bool matchCount(const char* state,
-    int i, int j, int k, int countX, int countO, int countE);
-	
-//given a mark (X, O or empty), and a particular row (i,j,k)
-//return its position; the check priority is i, j, k
-//this function is utilized with matchCount:
-//first using matchCount to check, say, two x's and one empty spot in certain row (i,j,k)
-//then, we need to get the exact location of that empty spot
-int getPos(const char* state, char mark, int i, int j, int k);
-
-//check whether the board has a FORK with given mark, that is:
-//2 x row which contains two same marks with one empty slot 
-bool hasFork(const char* state, char mark);
-
-
-void rotateCW90(const char* src, char* target);
-void mirror(const char* src, char* target);
-
-
+static QString QLEARNING_TRAINING_MODE = "training_mode";
+static QString QLEARNING_LOAD_TRAINING_DATA_ON_START = "load_training_data_on_start";
+static QString QLEARNING_TRAINING_DATA_PATH = "training_data_path";
+static QString QLEARNING_SAVE_TRAINING_DATA = "save_training_data";
 
 }
 
-#endif // GAMEDEF
+#endif // GAMEDEF_H
 

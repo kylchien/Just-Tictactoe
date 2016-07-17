@@ -1,36 +1,111 @@
 #include "config.h"
+#include "util/runtimeEx.h"
+#include "jsonReader.h"
 
-#include <stdexcept>
+#include <typeinfo>
+#include <sstream>
 
-#include <QDebug>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
 
-using namespace std;
-using namespace io;
+namespace io{
 
-Config::Config()
+Config::Config(const QString& path)
+    :path_(path), isInit_(false), config_{nullptr}
+{}
+
+Config::~Config()
+{ delete config_; }
+
+void Config::set(const QString& key, QString val)
 {
-	QFile loadFile(":/game.config");
-	if (!loadFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		string msg = "cannot open the resource file game.config!!!";
-		throw runtime_error(msg);
+    if(isInit_){
+		config_->insertValue<QString>(key, val);
 	}
-	QString content = loadFile.readAll();
-	loadFile.close();
-	QJsonDocument jsonDoc(QJsonDocument::fromJson(content.toUtf8()));
-	json_ = jsonDoc.object();
+    else THROW_RUNTIME_EX("Config is not initialized!");
 }
 
-Config::~Config(){}
-
-//return all values in string format (hence in game.config please use string as data format)
-QString Config::operator[](QString key) const
+void Config::initialize(const PairQStringVec& vec)
 {
-    if(json_.find(key) == json_.end()){
-        qWarning() << "entry '" << key << "' is not not found in Config";
-		return QString("");
-	}
-	return json_[key].toString();
+    if(!isInit_){
+        isInit_= true;
+        config_ = new io::JsonReader(path_);
+        const io::JsonReader& config = *config_;
+
+        for(auto p:vec){
+            const QString key = p.first;
+            QString val = config[key];
+            if(val == "") set(key, p.second);
+
+        }
+
+    }
 }
+
+void Config::initialize()
+{
+    if(!isInit_){
+        config_ = new io::JsonReader(path_);
+        isInit_= true;
+    }
+}
+
+
+
+template<typename T> 
+T Config::get(const QString& key) const
+{ 
+	std::stringstream ss;
+	ss << "type \"" << typeid(T).name() << "\" is not supported!";
+	THROW_RUNTIME_EX(ss.str()); 
+}
+
+
+
+QString Config::validatingGet(const QString& key) const
+{
+    if(!isInit_)
+        THROW_RUNTIME_EX("Config is not initialized!");
+    const io::JsonReader& config = *config_;
+    QString val = config[key];
+    if(val == ""){
+        std::stringstream ss;
+        ss << "key \"" << key.toStdString() << "\" is not found in config!";
+        THROW_RUNTIME_EX(ss.str());
+    }
+    return val;
+}
+
+template<>
+int Config::get(const QString& key) const
+{  return validatingGet(key).toInt();  }
+
+template<>
+QString Config::get(const QString& key) const
+{  return validatingGet(key);  }
+
+template<>
+std::string Config::get(const QString& key) const
+{  return validatingGet(key).toStdString();  }
+
+template<>
+bool Config::get(const QString& key) const
+{
+    QString val = validatingGet(key).toUpper();
+
+    if( val != "TRUE" && val != "FALSE" && val != "1" && val!= "0" &&
+            val != "ON" && val != "OFF"){
+        std::stringstream ss;
+        ss << "key \"" << key.toStdString() << "\" cannot be converted into valid boolean values!";
+        THROW_RUNTIME_EX(ss.str());
+    }
+
+    bool rs = false;
+
+    if( val == "TRUE" || val =="1" || val == "ON") rs = true;
+    if( val == "FALSE" || val =="0" || val == "OFF") rs = false;
+
+    return rs;
+}
+
+
+
+}//namespace

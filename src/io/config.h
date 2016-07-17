@@ -1,26 +1,50 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <QJsonObject>
+#include <utility>
+#include <vector>
+
 #include <QString>
+
 
 namespace io{
 
-class Config final
-{
+class JsonReader;
+
+class Config{
+
 public:
-    Config();
-    Config(const Config& src) = delete;
-    Config& operator=(const Config& src) = delete;
+    Config(const QString& path);
     ~Config();
 
-    void load();
-	QString operator[](QString key) const;
+    Config(const Config& src) = delete;
+    Config& operator=(const Config& src) = delete;
 
+	template<typename T> 
+	T get(const QString& key) const;
+    
+	void set(const QString& key, QString val);
+	
+
+    using PairQStringVec = std::vector< std::pair<QString, QString> >;
+
+    void initialize(const PairQStringVec& vec);
+    void initialize();
+
+
+	
 private:
-	QJsonObject json_;
+    QString path_;
+    bool isInit_;
+    io::JsonReader* config_;
+
+    inline QString validatingGet(const QString& key) const;
 
 };
 
-}
-#endif // CONFIG_H
+
+
+}//namespace
+
+
+#endif

@@ -1,4 +1,5 @@
 #include "tictactoe.h"
+#include "gameUtilFunc.h"
 #include "playerFactory.h"
 #include "player.h"
 #include <QtDebug>

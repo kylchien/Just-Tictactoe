@@ -24,8 +24,9 @@ ApplicationWindow {
 
     }
 
-    property var game: gameInstance
+    property var game: tictactoe
     property var optionWindow
+    property var soundSwitch: false
 
     Component.onCompleted: {
         initOptionWindow()
@@ -121,28 +122,34 @@ ApplicationWindow {
 
     Connections {
         target: game
-        onBoardChanged: {
+        //onBoardChanged: { //kchien
+        onChangingBoard: {
             board.children[pos].state = mark;
-            if(gameInstance.getCurrentTurn() == 'x')
-                sound.tick.play();
-            else
-                sound.blop.play();
-
+            if(soundSwitch){
+                if(game.getCurrentTurn() == 'x')
+                    sound.tick.play();
+                else
+                    sound.blop.play();
+            }
         }
     }
 
     Connections {
         target: game
-        onGameFinished: {
+        //onGameFinished: { //kchien
+        onSendingfinishingMsg: {
             messageDisplay.text = message
             messageDisplay.visible = true
-            sound.finish.play();
+            if(soundSwitch){
+                sound.finish.play();
+            }
         }
     }
 
     Connections{
         target: game
-        onWinningPositions:{
+        //onWinningPositions:{ //kchien
+        onMarkingConnectingBlocks: {
             for(var i =0; i<list.length;++i){
                 board.children[list[i]].blink.start()
             }
@@ -151,7 +158,8 @@ ApplicationWindow {
 
     Connections{
         target: game
-        onBoardLoaded:{
+        //onBoardLoaded:{
+        onLoadingBoard: {
             for(var i =0; i<list.length;++i){
                 board.children[i].state = list[i];
             }
@@ -199,8 +207,7 @@ ApplicationWindow {
     {
         //1.prohibt click signal triggers after game over
         //2.prohibt user quick click before AI moves
-        if(messageDisplay.visible == false &&
-            optionWindow.visible == false){
+        if(messageDisplay.visible == false && optionWindow.visible == false){
             if(game.isHumanTurn()){
                 game.updateBoard(index);
             }

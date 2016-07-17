@@ -1,9 +1,9 @@
-#include "maybePerfect.h"
-#include "../gameDef.h"
-#include "../util/utility.h"
-#include <QDebug>
+#include "MaybePerfect.h"
+#include "gameDef.h"
+#include "gameUtil.h"
+#include "util/random.h"
 
-#include "../playerFactory.h"
+#include <QDebug>
 
 //#define DEBUG_FLAG
 
@@ -14,22 +14,26 @@
     #define DEBUG(msg)
 #endif
 
-namespace ai{
-
-
+namespace agent{
 
 //initialize class static vector
-using Function = std::function<int(MaybePerfect*, const char*)>;
-std::vector<Function> MaybePerfect::ruleSet_;
+using Rules = std::function<int(MaybePerfect*, const char*)>;
+std::vector<Rules> MaybePerfect::ruleSet_;
 
-MaybePerfect::MaybePerfect(char mark):Player(mark)
+bool MaybePerfect::isInit_ = false;
+
+MaybePerfect::MaybePerfect(char mark):Agent(mark)
 {
-    initRules();
+    if(!isInit_){
+        initRules();
+        isInit_ = true;
+    }
 }
 
 
 MaybePerfect::~MaybePerfect()
-{}
+{
+}
 
 
 void MaybePerfect::initRules()
@@ -116,13 +120,12 @@ int MaybePerfect::doFork(const char* state)
 {
     DEBUG("in doFork");
 
-    std::vector<char*> futStates;
-    game::allocNextStates(selfMark_, state, futStates);
-    for(auto futState : futStates){
+    game::NextStates nextStates(selfMark_, state);
+    for(size_t idx = 0; idx < nextStates.size(); ++idx){
+        const char* futState = nextStates.at(idx);
         if(game::hasFork(futState, selfMark_))
             return (int)futState[game::BOARD_SIZE];
     }
-    game::deallocNextStates(futStates);
     return game::INVALID;
 }
 
@@ -132,13 +135,12 @@ int MaybePerfect::doBlockFork(const char* state)
 {
     DEBUG("in doBlockFork");
 
-    std::vector<char*> futStates;
-    game::allocNextStates(opponentMark_, state, futStates);
-    for(auto futState : futStates){
+    game::NextStates nextStates(selfMark_, state);
+    for(size_t idx = 0; idx < nextStates.size(); ++idx){
+        const char* futState = nextStates.at(idx);
         if(game::hasFork(futState, opponentMark_))
             return (int)futState[game::BOARD_SIZE];
     }
-    game::deallocNextStates(futStates);
     return game::INVALID;
 }
 
@@ -167,9 +169,9 @@ int MaybePerfect::doConnectTwo(const char* state)
         numX = 2; numO = 0;
     }
 
-    std::vector<char*> futStates;
-    game::allocNextStates(selfMark_, state, futStates);
-    for(auto futState : futStates){
+    game::NextStates nextStates(selfMark_, state);
+    for(size_t idx = 0; idx < nextStates.size(); ++idx){
+        const char* futState = nextStates.at(idx);
         for(int i=0; i<3; ++i){
             MAKE_CONNECT_TWO(futState, i, i+3, i+6, numX, numO, numE);
             MAKE_CONNECT_TWO(futState, 3*i, 3*i+1, 3*i+2, numX, numO, numE);
@@ -177,8 +179,6 @@ int MaybePerfect::doConnectTwo(const char* state)
         MAKE_CONNECT_TWO(futState, 0, 4, 8, numX, numO, numE);
         MAKE_CONNECT_TWO(futState, 2, 4, 6, numX, numO, numE);
     }
-
-    game::deallocNextStates(futStates);
     return game::INVALID;
 }
 
@@ -218,7 +218,7 @@ int MaybePerfect::doOppositeCorner(const char* state)
     if(vec.size() == 1) \
         return vec.at(0); \
     else if(!vec.empty()) \
-        return vec.at(util::uniformRand(0,vec.size()-1)); \
+        return vec.at(util::Random::uniformInt(0,vec.size()-1)); \
 
 
 int MaybePerfect::doEmptyCorner(const char* state)

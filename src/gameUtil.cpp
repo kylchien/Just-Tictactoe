@@ -1,10 +1,97 @@
-#include "gamedef.h"
+#include "gameUtil.h"
+#include "util/runtimeEx.h"
+#include "io/config.h"
+
 #include <cstdlib>
 #include <cstring>
-//#include "ai/ai.h"
+
 #include <QDebug>
 
 namespace game{
+
+
+NextStates::NextStates(char mark, const char* curState)
+{
+    size_ = 0;
+    std::vector<int> tempVec;
+
+    for(int i=0; i<BOARD_SIZE; ++i){
+        if(curState[i] == MARK_E) {
+            tempVec.push_back(i);
+            size_++;
+        }
+    }
+
+    states_ = (char*)std::calloc(size_, sizeof(char)*(BOARD_SIZE+1) );
+    if(states_ == nullptr){
+        THROW_RUNTIME_EX("Memory allocation failure!");
+    }
+
+    int offset = 0;
+    for(std::size_t i = 0; i < size_; ++i){
+        char* ptr = (char*)states_ + offset;
+        std::memcpy(ptr, curState, sizeof(char)* BOARD_SIZE);
+
+        ptr[tempVec.at(i)] = mark;
+        ptr[BOARD_SIZE] = (char)tempVec[i];
+
+        offset += BOARD_SIZE + 1;
+    }
+}
+
+
+NextStates::~NextStates()
+{ std::free(states_); }
+
+
+void swap(NextStates& lhs, NextStates& rhs)
+{
+    std::swap(lhs.size_, rhs.size_);
+    std::swap(lhs.states_, rhs.states_);
+}
+
+NextStates::NextStates(const NextStates& src)
+    :size_(0),states_(nullptr)
+{
+   size_ = src.size_;
+   auto chunkSize = sizeof(char)*(BOARD_SIZE+1);
+   states_ = (char*)std::calloc(size_, chunkSize);
+   std::memcpy(states_, src.states_, size_ * chunkSize);
+}
+
+NextStates& NextStates::operator=(NextStates other)
+{
+    swap(*this, other);
+    return *this;
+}
+
+NextStates::NextStates(NextStates&& other)
+    :size_(0),states_(nullptr)
+{
+   swap(*this, other);
+}
+
+NextStates& NextStates::operator=(NextStates&& other)
+{
+    if (this != &other){
+        if(states_ != nullptr) free(states_);
+        states_ = nullptr;
+        swap(*this, other);
+    }
+    return *this;
+}
+
+
+char* NextStates::at(std::size_t idx)
+{
+    if(idx >= size_){
+        THROW_RUNTIME_EX("idx is out of bound!");
+    }
+
+    return (char*)states_ + idx * (BOARD_SIZE+1);
+}
+
+
 
 char determineTurn(const char* curState)
 {
@@ -24,29 +111,6 @@ void copyBoard(const char* src, char* tgt)
     std::memcpy(tgt, src, sizeof(char)* BOARD_SIZE);
 }
 
-
-void allocNextStates(char mark, const char* curState, std::vector<char*>& futStates)
-{
-    for(int i=0; i<BOARD_SIZE; ++i){
-        if(curState[i] == MARK_E){
-            char* futState = (char*)malloc(sizeof(char)*(BOARD_SIZE+2));
-            //std::memcpy(futState, curState, sizeof(char)* BOARD_SIZE);
-            copyBoard(curState, futState);
-
-            futState[i] = mark;
-            futState[BOARD_SIZE] = (char)i; //record the index
-            futState[BOARD_SIZE+1] = '\0';
-
-            futStates.push_back(futState);
-        }
-    }
-}
-
-void deallocNextStates(std::vector<char*>& futStates)
-{
-    for(auto futState : futStates)
-        free(futState);
-}
 
 void push3(std::vector<int>& vec, int i, int j, int k)
 {
@@ -220,6 +284,15 @@ bool isFull(const char* state)
 }
 
 
+bool isEqual(const char* lhs, const char* rhs)
+{
+    for(int idx =0; idx < BOARD_SIZE; ++idx){
+        if(lhs[idx] != rhs[idx])
+            return false;
+    }
+    return true;
+}
+
 
 inline void count(const char& mark, int& numX, int& numO, int& numE)
 {
@@ -305,25 +378,18 @@ void mirror(const char* src, char* target)
     }
 }
 
-/*
-Player* createPlayer(PlayerType type, char mark)
-{
-    Player* p = nullptr;
-    switch(type)
-    {
-    case PlayerType::Human:
-        p = new Player(mark);
-        break;
-    case PlayerType::Minimax:
-        p = new ai::Minimax(mark);
-        break;
-    case PlayerType::MaybePerfect:
-        p = new ai::MaybePerfect(mark);
-        break;
-    }
-    return p;
-}*/
 
 
 
+std::shared_ptr<io::SimpleWriter>
+makeWriterFromGameConfig(){
+    io::Config config(GAME_CONFIG_PATH);
+    config.initialize();
+
+    std::string savePath = config.get<std::string>(SAVE_DATA_PATH);
+    int batchSize = config.get<int>(SAVE_BATCH_SIZE);
+    return std::make_shared<io::SimpleWriter>(savePath, batchSize);
 }
+
+
+}//namespace

@@ -1,0 +1,12 @@
+- statistics class
+- timer output milli seconds to statistic
+- construct a random player, intermediate player
+
+
+- automatically detect if there is no config; generate config for it
+
+- create a utility function for equal(double, double)
+- create TiePicker class
+- create bool runInGui in Agent?
+
+
