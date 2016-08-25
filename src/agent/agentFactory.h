@@ -8,7 +8,7 @@
 
 //qt lib
 #include <QString>
-
+#include <QVariant>
 
 namespace agent{
 
@@ -26,7 +26,7 @@ public:
 
     static std::unique_ptr<Agent> createAgent(QString type, char c);
 
-
+    static QVariantList getEnlistedAgents();
 	
 };	
 

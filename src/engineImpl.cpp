@@ -53,12 +53,6 @@ Engine::Impl::getPlayer(char mark)
     }
 }
 
-
-void Engine::Impl::setGameMode(int mode)
-{
-    gameMode_ = static_cast<GameMode>(mode);
-}
-
 const char* INVALID_GAME_MODE = "invalid game mode!";
 
 bool Engine::Impl::isHumanTurn() const
@@ -79,23 +73,30 @@ bool Engine::Impl::isHumanTurn() const
     return false;
 }
 
-void Engine::Impl::createPlayers()
+void Engine::Impl::setGameMode(int mode)
 {
+    gameMode_ = static_cast<GameMode>(mode);
+}
+
+void Engine::Impl::createPlayers(int mode, const QString& agentForX, const QString& agentForO)
+{
+    gameMode_ = static_cast<GameMode>(mode);
+
     switch(gameMode_){
     case GameMode::HH:
         break;
 
     case GameMode::HM:
-        playerO_->setAgent(AgentFactory::createAgent("QLearning", MARK_O));
+        playerO_->setAgent(AgentFactory::createAgent(agentForO, MARK_O));
         break;
 
     case GameMode::MH:
-        playerX_->setAgent(AgentFactory::createAgent("Negmax", MARK_X));
+        playerX_->setAgent(AgentFactory::createAgent(agentForX, MARK_X));
         break;
 
     case GameMode::MM:
-        playerX_->setAgent(AgentFactory::createAgent("QLearning", MARK_X));
-        playerO_->setAgent(AgentFactory::createAgent("QLearning", MARK_O));
+        playerX_->setAgent(AgentFactory::createAgent(agentForX, MARK_X));
+        playerO_->setAgent(AgentFactory::createAgent(agentForO, MARK_O));
         break;
 
     default:

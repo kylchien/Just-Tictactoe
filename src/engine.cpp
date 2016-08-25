@@ -13,8 +13,8 @@ Engine::~Engine()
 void Engine::setGameMode(int mode)
 { impl_->setGameMode(mode); }
 
-void Engine::createPlayers()
-{ impl_->createPlayers(); }
+void Engine::createPlayers(int mode, const QString& agentForX, const QString& agentForO)
+{ impl_->createPlayers(mode, agentForX, agentForO); }
 
 char Engine::getCurrentTurn() const
 { return impl_->getCurrentTurn(); }

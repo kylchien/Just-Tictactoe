@@ -10,6 +10,8 @@
 #include <memory>
 #include <vector>
 
+#include <QString>
+
 using io::Config;
 using io::SimpleWriter;
 
@@ -49,7 +51,7 @@ public:
 
     void setGameMode(int mode);
 
-    void createPlayers();
+    void createPlayers(int mode, const QString& agentForX, const QString& agentForO);
 
     void flipTurn();
 

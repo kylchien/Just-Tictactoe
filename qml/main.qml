@@ -16,20 +16,20 @@ ApplicationWindow {
     minimumHeight: 515
     maximumHeight: 515
 
-    Image {
-        id: boardImage
-        source: "../asset/board.png"
-        opacity: 1.0
-        anchors.centerIn: parent
-
-    }
-
     property var game: tictactoe
     property var optionWindow
     property var soundSwitch: false
 
     Component.onCompleted: {
         initOptionWindow()
+    }
+
+    Image {
+        id: boardImage
+        source: "../asset/board.png"
+        opacity: 1.0
+        anchors.centerIn: parent
+
     }
 
     Column {
@@ -122,7 +122,6 @@ ApplicationWindow {
 
     Connections {
         target: game
-        //onBoardChanged: { //kchien
         onChangingBoard: {
             board.children[pos].state = mark;
             if(soundSwitch){
@@ -136,7 +135,6 @@ ApplicationWindow {
 
     Connections {
         target: game
-        //onGameFinished: { //kchien
         onSendingfinishingMsg: {
             messageDisplay.text = message
             messageDisplay.visible = true
@@ -148,7 +146,6 @@ ApplicationWindow {
 
     Connections{
         target: game
-        //onWinningPositions:{ //kchien
         onMarkingConnectingBlocks: {
             for(var i =0; i<list.length;++i){
                 board.children[list[i]].blink.start()
@@ -158,7 +155,6 @@ ApplicationWindow {
 
     Connections{
         target: game
-        //onBoardLoaded:{
         onLoadingBoard: {
             for(var i =0; i<list.length;++i){
                 board.children[i].state = list[i];
@@ -190,7 +186,7 @@ ApplicationWindow {
     function initOptionWindow() {
         var component = Qt.createComponent("OptionWindow.qml");
         var ow = component.createObject(gameWindow);
-        optionWindow = ow
+        optionWindow = ow;
         optionWindow.show();
     }
 

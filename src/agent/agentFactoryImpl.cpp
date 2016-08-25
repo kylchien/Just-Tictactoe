@@ -42,9 +42,24 @@ std::unique_ptr<Agent> AgentFactory::Impl::createAgent(QString type, char c)
         THROW_RUNTIME_EX(msg);
     }
 
+    //qDebug() << "AgentFactory creates agent " << type << " for player" << QChar(c);
+
     auto func = map_[type];
     std::unique_ptr<Agent> p{ func(c)};
     return p;
+}
+
+QVariantList AgentFactory::Impl::getEnlistedAgents()
+{
+    if (!init_) { initialize(); }
+
+    QVariantList list;
+    for(auto agentInfo:map_){
+        if(agentInfo.first != Agent::type())
+            list << agentInfo.first;
+    }
+
+    return list;
 }
 
 

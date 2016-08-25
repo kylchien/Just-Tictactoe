@@ -9,6 +9,7 @@
 
 //qt lib
 #include <QString>
+#include <QVariant>
 
 
 namespace agent{
@@ -42,6 +43,8 @@ public:
     Impl& operator= (const Impl& src) = delete;
 
     std::unique_ptr<Agent> createAgent(QString type, char c);
+
+    static QVariantList getEnlistedAgents();
 
 };	
 

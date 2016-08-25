@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <QString>
 
 namespace game{
 
@@ -25,7 +26,7 @@ public:
     void loadBoard(const std::string& board);
     void restart();
     void setGameMode(int mode);
-    void createPlayers();
+    void createPlayers(int mode, const QString& agentForX, const QString& agentForO);
 
     bool isHumanTurn() const;
 

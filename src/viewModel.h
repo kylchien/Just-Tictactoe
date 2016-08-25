@@ -29,11 +29,12 @@ public:
     ViewModel& operator= (const ViewModel& src) = delete;
 
     Q_INVOKABLE void restart();
-    Q_INVOKABLE void createPlayers();
+    Q_INVOKABLE void createPlayers(int mode, QString agentForX, QString agentForO);
     Q_INVOKABLE void setGameMode(int mode);
     Q_INVOKABLE bool isHumanTurn() const;
     Q_INVOKABLE QChar getCurrentTurn() const;
     Q_INVOKABLE void loadBoard(std::string boardInfo);
+    Q_INVOKABLE QVariantList getAI();
 
     //easy for testing
     std::shared_ptr<Engine> getEngine()

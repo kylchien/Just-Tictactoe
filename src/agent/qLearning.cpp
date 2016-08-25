@@ -120,68 +120,6 @@ int QLearning::move(const char* state)
 
 
 /*
-double QLearning::oldValue(const char* stateAction)
-{
-    double val;
-    if(!lookupTable_.get(stateAction, val)){
-        val = DRAW;
-        lookupTable_.set(stateAction, val);
-    }
-
-    if(val < -1 || val > 1) {
-        THROW_RUNTIME_EX("invalid value!");
-    }
-    return (1-alpha)* val;
-}
-
-double QLearning::learnedValue(const char* s_t1, int move)
-{
-    //cout << "for " << s_t1 << endl;
-    double reward = DRAW, best = DRAW;
-	
-    if(isWon(s_t1, move)){
-            reward = (s_t1[move] == MARK_X)?X_WIN:O_WIN;
-    }
-    else if(!isFull(s_t1)){
-        best = (selfMark_ == MARK_X)?(-INF):(INF);
-        vector<char*> futStates;
-        game::allocNextStates(opponentMark_, s_t1, futStates);
-        for(unsigned int i =0; i<futStates.size(); ++i){
-            double val = best;
-            char* futState = futStates.at(i);
-            if(!lookupTable_.get(futState, val)){
-                val = DRAW;
-                lookupTable_.update(futState, val);
-            }
-
-            //cout << "val:" << val << ", best:" << best << endl;
-            if(isBetter(val, best))	{
-                //cout << "set best to " << val << endl;
-                best = val;
-            }
-            //else {
-            //	cout << "best " << best << " is not updated" << endl;
-            //}
-        }//for
-        game::deallocNextStates(futStates);
-    }
-	
-
-    double val = alpha * (reward + gamma * best);
-
-    if(val < -1 || val > 1){
-        stringstream ss;
-        ss << "alpha:" << alpha << ", reward:" << reward << ", gamma:" << gamma << ", best:" << best;
-        throw THROW_RUNTIME_EX(ss.str());
-    }
-
-    return val;
-}
-*/
-
-
-
-/*
 Q_t1(s_t, a_t) = Q_t(s_t, a_t) + 
 	alpha_t(s_t, a_t) * {R_t1 + gamma * maxQ_t(s_t1, a_t) - Q_t(s_t, a_t)}
 */
@@ -275,19 +213,6 @@ void QLearning::print()
     lookupTable_.print();
 }
 
-/*
-p1->configure(config)
-QLearning::selfTrain(QLearning* p1, Qlearning* p2);
-
-p1->loadData(trainedStateActionData);
-p1->move();
-
-if state_action not found, 	
-	if state_action is terminal state, set to terminal reward and return
-	else add (state_action,0), return
-
-if state_action is found, proceed with update
-*/
 
 
 }//namespace

@@ -20,6 +20,10 @@ std::unique_ptr<Agent> AgentFactory::createAgent(QString type, char c)
     return impl_->createAgent(type, c);
 }
 
+QVariantList AgentFactory::getEnlistedAgents()
+{
+     return impl_->getEnlistedAgents();
+}
 
 
 	

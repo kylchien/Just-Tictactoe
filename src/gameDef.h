@@ -15,12 +15,17 @@ static constexpr char MARK_E = '~';
 
 enum class GameMode{HH = 0, HM = 1, MH = 2, MM = 3};
 
+//#define WORK_ENV
+#ifdef WORK_ENV
+static QString GAME_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\game.config";
+static QString QLEARNING_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\qLearning.config";
+#else
 static QString GAME_CONFIG_PATH = "C:\\Project\\Just-Tictactoe\\game.config";
-//static QString GAME_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\game.config";
-
 static QString QLEARNING_CONFIG_PATH = "C:\\Project\\Just-Tictactoe\\qLearning.config";
-//static QString QLEARNING_CONFIG_PATH = "S:\\data\\Just-Tictactoe\\qLearning.config";
+#endif
 
+//delay AI's reponse (in msec) so human can perceive its moves
+static constexpr int AI_RESPONSE_DELAY = 600;
 
 static QString NUM_OF_GAMES = "num_of_games";
 static QString PLAYER_X = "player_x";

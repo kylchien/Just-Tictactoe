@@ -1,6 +1,7 @@
 #include "viewModel.h"
 #include "gameUtil.h"
 #include "player.h"
+#include "agent/agentFactory.h"
 
 #include <qDebug>
 
@@ -14,10 +15,10 @@ ViewModel::ViewModel():engine_{new Engine()}
 ViewModel::~ViewModel()
 {}
 
-void ViewModel::createPlayers()
+void ViewModel::createPlayers(int mode, QString agentForX, QString agentForO)
 {
 
-    engine_->createPlayers();
+    engine_->createPlayers(mode, agentForX, agentForO);
     if(!isInit){
         connect(
             this, &ViewModel::notfyingPlayer,
@@ -37,10 +38,8 @@ void ViewModel::createPlayers()
     notifyPlayers();
 }
 
-static int GAMEMODE = -1;
 void ViewModel::setGameMode(int mode)
 {
-    GAMEMODE = mode;
     engine_->setGameMode(mode);
 }
 
@@ -115,6 +114,11 @@ void ViewModel::loadBoard(std::string boardInfo)
         loadedBoard_ << QChar(c);
 
     emit loadingBoard(loadedBoard_);
+}
+
+QVariantList ViewModel::getAI()
+{
+    return agent::AgentFactory::getEnlistedAgents();
 }
 
 

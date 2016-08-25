@@ -1,4 +1,5 @@
 #include "player.h"
+#include "gameDef.h"
 
 #include <QTimer>
 #include <QDebug>
@@ -33,8 +34,11 @@ void Player::makingMove(char mark, const char* state)
     if(mark == selfMark_){
         int move = this->move(state); 
         if( move != game::INVALID){
-            //delay AI's reponse (700ms) so human can percept its moves
-            QTimer::singleShot(700, [this, move](){emit sendingMove(move);} );
+            //delay AI's reponse (in msec) so human can perceive its moves
+            QTimer::singleShot(
+                AI_RESPONSE_DELAY,
+                [this, move](){emit sendingMove(move);}
+            );
         }
     }
 }
