@@ -1,7 +1,6 @@
 #include "Minimax.h"
 #include "gameDef.h"
 #include "gameUtil.h"
-#include "util/random.h"
 
 #include <QDebug>
 
@@ -15,7 +14,9 @@ namespace agent{
 
 Minimax::Minimax(char mark, bool randomForTie)
     :Agent(mark), random_(randomForTie)
-{}
+{
+    tieBreaker_.setInitVal(-INF);
+}
 
 Minimax::~Minimax()
 {}
@@ -41,32 +42,21 @@ int Minimax::move(const char* state)
 
         if(DEBUG) qDebug() << "pos:" << pos << ", val:" << val;
 
-        if(random_ && approxEqual(val, best, EPSILON)){
-            tieBreaker_.push_back(pos);
+        if(random_){
+            tieBreaker_.add(pos, val);
             continue;
         }
 
         if( val > best){
             best = val;
             bestPos = pos;
-
-            //first evaluation always beats the best(which is -ininity)
-            //we want to put it to tieBreaker as well
-            if(i == 0)
-                tieBreaker_.push_back(pos);
-            else
-                tieBreaker_.clear();
         }
     }
 
-    if(random_ && !tieBreaker_.empty()){
-        if(DEBUG){
-            for(int index : tieBreaker_)
-                qDebug() << "tieBreaker:" << index;
-        }
-        int index = util::Random::uniformInt(0,tieBreaker_.size()-1);
-        bestPos = tieBreaker_[index];
-        tieBreaker_.clear();
+    if(random_){
+        bestPos = tieBreaker_.getBestPos();
+        tieBreaker_.reset();
+
     }
 
     if(DEBUG) qDebug() << "best pos:" << bestPos << "\n";

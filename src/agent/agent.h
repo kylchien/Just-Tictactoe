@@ -15,7 +15,8 @@ protected:
     char opponentMark_;
 
 public:
-    Agent(char mark):selfMark_(mark){
+    Agent(char mark):selfMark_(mark)
+    {
         opponentMark_ = (mark == game::MARK_O)? game::MARK_X : game::MARK_O;
     }
 
@@ -25,15 +26,20 @@ public:
     Agent& operator= (const Agent& src) = delete;
 
     //omit variable name to "disable" unused variable warning
-    virtual int move(const char*){
+    virtual int move(const char*)
+    {
         return game::INVALID;
     }
 
-    virtual QString getType(){
+    virtual void postProcess(){}
+
+    virtual QString getType()
+    {
         return QString("Agent");
     }
 
-    static QString type(){
+    static QString type()
+    {
         return QString("Agent");
     }
 };

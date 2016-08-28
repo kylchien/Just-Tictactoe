@@ -22,6 +22,7 @@ NextStates::NextStates(char mark, const char* curState)
         }
     }
 
+    //allocate a long array that contains all possible next-states info
     states_ = (char*)std::calloc(size_, sizeof(char)*(BOARD_SIZE+1) );
     if(states_ == nullptr){
         THROW_RUNTIME_EX("Memory allocation failure!");

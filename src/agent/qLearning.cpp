@@ -5,6 +5,7 @@
 #include "util/random.h"
 #include "io/simpleWriter.h"
 #include "io/simpleReader.h"
+#include "tieBreaker.h"
 
 #include <fstream>
 #include <sstream>
@@ -48,10 +49,10 @@ QLearning::QLearning(char mark):Agent(mark)
 
         isTraining_ = config_->get<bool>(QLEARNING_TRAINING_MODE);
 
-        bool loadData = config_->get<bool>(
-            QLEARNING_LOAD_TRAINING_DATA_ON_START);
+        bool loadData = config_->get<bool>(QLEARNING_LOAD_TRAINING_DATA_ON_START);
+
         if(loadData){
-            dataPath_ = ( config_->get<QString>(QLEARNING_TRAINING_DATA_PATH)).toStdString();
+            dataPath_ = (config_->get<QString>(QLEARNING_TRAINING_DATA_PATH)).toStdString();
 
             if(io::SimpleReader::canBeOpen(dataPath_)){
                 lookupTable_.loadData(dataPath_);
@@ -75,7 +76,7 @@ QLearning::~QLearning()
 
             //currently it is simple overwritten - do we want to change in the future?
             lookupTable_.saveData(writer);
-            qDebug() << "qLearning done" ;
+            qDebug() << "writing qLearning.dat done" ;
         }
         isInit_ = false;
     }
@@ -95,26 +96,30 @@ bool QLearning::leftBetterThanRight(double lhs, double rhs, char mark)
 
 int QLearning::move(const char* state)
 {
-    if(isTraining_) return trainMove(state);
+    if(isTraining_) {
+        return trainMove(state);
+    }
 	
     game::NextStates nextStates(selfMark_, state);
 
-    double best = (selfMark_ == MARK_X)?(-INF):(INF);
-    int bestPos = INVALID;
+    double initBestVal = (selfMark_ == MARK_X)?(-INF):(INF);
+
+    tieBreaker_.setInitVal(initBestVal);
 
     for(unsigned int i=0; i<nextStates.size(); ++i){
-        double val;
         char* futState = nextStates.at(i);
+        double val;
+        int pos = futState[game::BOARD_SIZE];
         if(!lookupTable_.get(futState, val)){
             val = DRAW;
             lookupTable_.set(futState, val);
         }
-        if(leftBetterThanRight(val, best, selfMark_)){
-            best = val;
-            bestPos = futState[game::BOARD_SIZE];
-        }
+
+        tieBreaker_.add(pos, val, selfMark_);
     }
 	
+    int bestPos = tieBreaker_.getBestPos();
+    tieBreaker_.reset();
     return bestPos;
 }
 
@@ -179,8 +184,8 @@ int QLearning::trainMove(const char* state)
     int action = INVALID;
     int index = 0;
 
-    //exploitation
     if(util::Random::uniformReal(0,1) < exploitProb){
+        //exploitation
         double best = (selfMark_ == MARK_X)?(-INF):(INF);
         for(unsigned int i =0; i<nextStates.size(); ++i){
             double val = DRAW;
@@ -194,8 +199,8 @@ int QLearning::trainMove(const char* state)
             }
         }
     }
-    //exploration
     else{
+        //exploration
         int size = (int)nextStates.size();
         index = util::Random::uniformInt(0, size-1);
         action = (nextStates.at(index))[game::BOARD_SIZE];
@@ -205,7 +210,26 @@ int QLearning::trainMove(const char* state)
     double val = qLearning(stateAction, action);
     lookupTable_.set(stateAction, val);
 
+
+    std::string theState(stateAction, game::BOARD_SIZE+1);
+    history_.emplace_back(theState);
+
     return action;
+}
+
+void QLearning::postProcess()
+{
+    if(isTraining_) {
+        //backward propgating the Q value
+        for(int idx = history_.size()-1; idx >=0; --idx){
+            const char* stateAction = history_.at(idx).c_str();
+            int action = stateAction[game::BOARD_SIZE];
+            double val = qLearning(stateAction, action);
+            lookupTable_.set(stateAction, val);
+        }
+        history_.clear();
+        //qDebug() << "QLearning::postProcess";
+    }
 }
 
 void QLearning::print()
@@ -216,3 +240,8 @@ void QLearning::print()
 
 
 }//namespace
+
+/*
+ * test case
+ * ~o~~x~~~~
+ */

@@ -43,6 +43,11 @@ void Player::makingMove(char mark, const char* state)
     }
 }
 
+void Player::postProcess()
+{
+    agent_->postProcess();
+}
+
 
 
 }//namespace

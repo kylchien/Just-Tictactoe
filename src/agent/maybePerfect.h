@@ -29,7 +29,7 @@ public:
     MaybePerfect& operator=(const MaybePerfect&src) = delete;
 
     int move(const char* state) override;
-	
+
     static QString type()
     {
         static QString type("MaybePerfect");

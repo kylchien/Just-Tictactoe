@@ -31,10 +31,6 @@ SOURCES += \
     src/agent/qLearning.cpp \
     src/stateInfo.cpp
 
-
-
-
-
 RESOURCES += qml.qrc \
     resource.qrc
 
@@ -67,14 +63,8 @@ HEADERS += \
     src/gameUtil.h \
     src/lookupTable.h \
     src/agent/qLearning.h \
-    src/stateInfo.h
-
-
-
-
-
-
-
+    src/stateInfo.h \
+    src/agent/tieBreaker.h
     
 
 DISTFILES += \

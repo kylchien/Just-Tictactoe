@@ -1,8 +1,8 @@
 #ifndef AGENT_MINIMAX_H
 #define AGENT_MINIMAX_H
 
-#include <vector>
 #include "agent.h"
+#include "tieBreaker.h"
 
 namespace agent{
 
@@ -36,10 +36,11 @@ protected:
     static constexpr int MAX_DEPTH = 9;
 
     bool random_;
-    std::vector<int> tieBreaker_;
+    TieBreaker tieBreaker_;
 
     bool approxEqual(double f1, double f2, double epsilon);
     double minimax(const char* state, int depth, bool isMax);
+
 
 
 };

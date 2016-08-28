@@ -31,6 +31,8 @@ public:
     //{ return agent_; }
 
 	int move(const char* state);
+
+    void postProcess();
 	
 signals:
     void sendingMove(int pos);

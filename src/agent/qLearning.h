@@ -4,6 +4,7 @@
 #include "agent.h"
 #include "../lookupTable.h"
 #include "io/config.h"
+#include "tieBreaker.h"
 
 #include <memory>
 #include <vector>
@@ -23,10 +24,9 @@ protected:
     static constexpr double X_WIN = 1;
     static constexpr double O_WIN = -1;
     static constexpr double DRAW = 0;
-    static constexpr double alpha = 0.1;
-    static constexpr double gamma = 0.1;
+    static constexpr double alpha = 0.2;
+    static constexpr double gamma = 0.2;
     static constexpr double exploitProb = 0.5;
-    static constexpr double EPSILON = 0.0001;
 
     static bool isInit_;
     static bool isTraining_;
@@ -35,7 +35,8 @@ protected:
     static std::unique_ptr<io::Config> config_;
     static LookupTable lookupTable_;
 
-    std::vector<int> tieBreaker_;
+    TieBreaker tieBreaker_;
+    std::vector<std::string> history_;
 
     double qLearning(const char* sa, int a);
 
@@ -48,6 +49,8 @@ public:
     virtual ~QLearning();
 
     virtual int move(const char* state) override;
+
+    virtual void postProcess() override;
 
     static void setTraining(bool training)
     { isTraining_ = training; }

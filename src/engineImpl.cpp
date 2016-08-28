@@ -225,6 +225,9 @@ void Engine::Impl::run()
             if(isWon(board_,move)) break;
 		}//end while
 
+        playerX_->postProcess();
+        playerO_->postProcess();
+
         if(savingGame){
             sw->writeLine(toString(vec));
         }

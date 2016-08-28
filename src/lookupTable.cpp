@@ -8,6 +8,8 @@
 #include <sstream>
 #include <tuple>
 
+#include <qDebug>
+
 namespace game{
 
 
@@ -79,42 +81,22 @@ void LookupTable::addRotatedEntries(const char* s, Double* p)
 
     if(isEqual(state, rotated)) return;
 
-    std::string k(rotated, 0, BOARD_SIZE);
+    std::string k(rotated, BOARD_SIZE);
     map_.insert( std::make_pair(k,p) );
 
     for(int i=0; i<2; i++){
         copyBoard(rotated, state);
         rotateCW90(state, rotated);
 
-        std::string key(rotated, 0, BOARD_SIZE);
+        std::string key(rotated, BOARD_SIZE);
         map_.insert( std::make_pair(key, p));
 	}
 }
 
 void LookupTable::set(const char* s, double val)
 {
-    std::string key(s, 0, BOARD_SIZE);
+    std::string key(s, BOARD_SIZE);
     set(key, val);
-    /*
-    std::unordered_map<std::string, Double*>::iterator iter = map_.find(key);
-	if(iter == map_.end()){      			
-        Double* p = new Double(val);
-
-        mapUnique_.emplace(std::make_pair(key, p));
-        map_.emplace(std::make_pair(key, p));
-
-        addRotatedEntries(s, p);
-
-        char mirrorState[BOARD_SIZE];
-        mirror(s, mirrorState);
-        if(!isEqual(s,mirrorState)){
-            map_.insert({std::string(mirrorState, 0, BOARD_SIZE), p});
-            addRotatedEntries(mirrorState, p);
-        }
-	}
-	else{
-        iter->second->set(val);
-    }*/
 }
 
 void LookupTable::set(const std::string& state, double val)
@@ -132,7 +114,7 @@ void LookupTable::set(const std::string& state, double val)
         char mirrorState[BOARD_SIZE];
         mirror(s, mirrorState);
         if(!isEqual(s,mirrorState)){
-            map_.insert({std::string(mirrorState, 0, BOARD_SIZE), p});
+            map_.insert({std::string(mirrorState, BOARD_SIZE), p});
             addRotatedEntries(mirrorState, p);
         }
     }
@@ -143,7 +125,7 @@ void LookupTable::set(const std::string& state, double val)
 
 bool LookupTable::get(const char* s, double& output)
 {
-    std::string key(s, 0, BOARD_SIZE);
+    std::string key(s, BOARD_SIZE);
 	
     std::unordered_map<std::string, Double*>::iterator iter = map_.find(key);
 	if(iter == map_.end()){ 
@@ -191,6 +173,13 @@ void LookupTable::loadData(const std::string& filePath)
     for(auto tuple : vec){
         set(std::get<0>(tuple), std::get<1>(tuple));
     }
+
+    //double v;
+    //get("xoo~x~x~~",v);
+    //qDebug() << "get " << v;
+    //abort();
+    //"~o~~x~x~~"
+    //"xoo~x~x~~"
 }
 
 

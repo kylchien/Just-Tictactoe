@@ -1,7 +1,6 @@
 #include "Negmax.h"
 #include "gameDef.h"
 #include "gameUtil.h"
-#include "util/random.h"
 
 #include <algorithm>
 #include <vector>
@@ -20,7 +19,9 @@ namespace agent{
 
 Negmax::Negmax(char mark, bool randomForTie, bool alphaBeta)
     :Minimax(mark, randomForTie), alphaBeta_(alphaBeta)
-{}
+{
+    tieBreaker_.setInitVal(-INF);
+}
 
 Negmax::~Negmax()
 {}
@@ -29,8 +30,9 @@ int Negmax::move(const char* state)
 {
     game::NextStates futStates(selfMark_, state);
 
-    float best = -INF;
+    double best = -INF;
     int bestPos = -1;
+
     for(std::size_t i =0; i<futStates.size(); ++i){
 
         char* futState = futStates.at(i);
@@ -41,25 +43,21 @@ int Negmax::move(const char* state)
 		
         if(DEBUG) qDebug() << "pos:" << pos << ", val:" << val;
 
-        if(random_ && approxEqual(val, best, EPSILON)){
-            tieBreaker_.push_back(pos);
+        if(random_){
+            tieBreaker_.add(pos, val);
             continue;
         }
 
         if( val > best){
             best = val;
             bestPos = pos; 
-            if(i == 0)							//1st time evaluation always beats the best
-                tieBreaker_.push_back(pos);     //we want to put it to tieBreaker
-            else
-                tieBreaker_.clear();
         }
     }
 
-    if(random_ && !tieBreaker_.empty()){
-        int index = util::Random::uniformInt(0,tieBreaker_.size()-1);
-        bestPos = tieBreaker_[index];
-        tieBreaker_.clear();
+
+    if(random_){
+        bestPos = tieBreaker_.getBestPos();
+        tieBreaker_.reset();
     }
 
     if(DEBUG) qDebug() << "best pos:" << bestPos << "\n";
