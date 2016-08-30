@@ -33,7 +33,7 @@ public:
     inline void setPath(const string& path)
     {  filePath_ = path; }
 
-    inline int getBatchSize() const
+    inline size_t getBatchSize() const
     {  return batchSize_;  }
 
     inline void setBatchSize(int batch)

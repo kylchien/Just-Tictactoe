@@ -218,7 +218,7 @@ int MaybePerfect::doOppositeCorner(const char* state)
     if(vec.size() == 1) \
         return vec.at(0); \
     else if(!vec.empty()) \
-        return vec.at(util::Random::uniformInt(0,vec.size()-1)); \
+        return vec.at(util::Random::uniformInt(0, (int)vec.size()-1)); \
 
 
 int MaybePerfect::doEmptyCorner(const char* state)

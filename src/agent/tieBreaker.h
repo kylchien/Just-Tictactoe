@@ -58,7 +58,7 @@ public:
     inline int getBestPos() const
     {
         if(arena_.size() > 1){
-            int idx = util::Random::uniformInt(0,arena_.size()-1);
+            int idx = util::Random::uniformInt(0, (int)arena_.size()-1);
             return arena_[idx];
         }
         return bestPos_;

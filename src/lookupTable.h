@@ -23,7 +23,7 @@ public:
 
     //dunno T type, cannot simply data_ = other.data_
     AtomicData(const AtomicData& other) = delete;
-    AtomicData& operator=(AtomicData other) = delete;
+    AtomicData& operator=(AtomicData& other) = delete;
 
     AtomicData(AtomicData&& other);
     AtomicData& operator=(AtomicData&& other);

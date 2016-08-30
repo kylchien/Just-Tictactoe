@@ -23,7 +23,7 @@ Engine::Impl::Impl():
     playerO_{new Player(MARK_O)},
     config_{new Config(GAME_CONFIG_PATH)}
 {
-    for(char& c: board_){ c = MARK_E; }
+	for (char& c : board_) { c = MARK_E; } 
 }
 
 

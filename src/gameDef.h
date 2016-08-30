@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#define WORK_ENV
+//#define WORK_ENV
 
 namespace game{
 

@@ -9,7 +9,8 @@ namespace util{
 //ref http://www.guyrutenberg.com/2014/05/03/c-mt19937-example/
 
 auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-std::mt19937 Random::rndEngine_(seed);
+std::seed_seq seq{seed};
+std::mt19937 Random::rndEngine_(seq);
 
 int Random::uniformInt(int inLB, int inUB) {
     std::uniform_int_distribution<> dist(inLB, inUB);

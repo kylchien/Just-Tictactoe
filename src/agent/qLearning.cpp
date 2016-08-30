@@ -221,7 +221,7 @@ void QLearning::postProcess()
 {
     if(isTraining_) {
         //backward propgating the Q value
-        for(int idx = history_.size()-1; idx >=0; --idx){
+        for(auto idx = history_.size()-1; idx >=0; --idx){
             const char* stateAction = history_.at(idx).c_str();
             int action = stateAction[game::BOARD_SIZE];
             double val = qLearning(stateAction, action);

@@ -35,12 +35,12 @@ public:
     std::string elapse(){
         auto duration = hi_res_clock::now() - start_;
         auto mi = std::chrono::duration_cast<milliseconds>(duration);
-        long time = mi.count();
-        int h = time/3600000;
+        auto time = mi.count();
+        auto h = time/3600000;
         time %= 3600000;
-        int m = time/60000;
+        auto m = time/60000;
         time %= 60000;
-        int s = time/1000;
+        auto s = time/1000;
         time %= 1000;
 
         std::stringstream ss;
